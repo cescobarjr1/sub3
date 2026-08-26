@@ -1,0 +1,12 @@
+{
+  "name": "sub3-strava-sync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend that syncs new Strava runs into Supabase for the sub-3 marathon tracker.",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
