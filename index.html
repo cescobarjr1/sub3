@@ -123,6 +123,10 @@
   .plan-week-body{padding:0 14px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;display:none;}
   .plan-week-body.open{display:block;}
   .plan-week-body b{color:var(--text);}
+  .plan-actual{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+  .pa-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:3px 0;gap:10px;}
+  .pa-row span:first-child{color:var(--text-muted);flex-shrink:0;}
+  .pa-row span:last-child{text-align:right;}
 
   nav.tabbar{position:fixed;bottom:0;left:0;right:0;background:rgba(18,21,26,0.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:10;}
   nav.tabbar button{flex:1;background:none;border:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;padding:8px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
@@ -253,6 +257,22 @@ function getWeekForDate(dateObj){
 }
 function currentWeek(){ return getWeekForDate(new Date()); }
 
+// Compares a plan week's prescription against what was actually logged:
+// total miles, the longest 'long' run that week, and whether a
+// tempo/speed session was completed.
+function getWeekActuals(wk){
+  const weekStart = new Date(wk.start+'T00:00:00');
+  const weekEnd = addDays(weekStart, 6);
+  const weekRuns = RUNS.filter(r=>{
+    const d = new Date(r.date+'T00:00:00');
+    return d>=weekStart && d<=weekEnd;
+  });
+  const totalMi = weekRuns.reduce((a,r)=>a+r.distance,0);
+  const longRun = weekRuns.filter(r=>r.type==='long').sort((a,b)=>b.distance-a.distance)[0] || null;
+  const keySession = weekRuns.find(r=> r.type==='tempo' || r.type==='speed') || null;
+  return { totalMi, longRun, keySession };
+}
+
 function secToPace(sec){
   if(!isFinite(sec) || sec<=0) return '—:—';
   const m = Math.floor(sec/60);
@@ -323,6 +343,13 @@ function renderDashboard(){
 
   const pct = Math.min(100, (totalMi/wk.miles)*100);
   const over = totalMi >= wk.miles;
+  const actual = getWeekActuals(wk);
+  const longActualText = actual.longRun
+    ? ` — <span style="color:var(--green);">ran ${actual.longRun.distance.toFixed(1)}mi @ ${secToPace(actual.longRun.time/actual.longRun.distance)}/mi</span>`
+    : (wk.long>0 ? ` — <span style="color:var(--text-muted);">not yet logged</span>` : '');
+  const keyActualText = actual.keySession
+    ? `<span style="color:var(--green);">✓ ${TYPE_LABEL[actual.keySession.type]} ${actual.keySession.distance.toFixed(1)}mi @ ${secToPace(actual.keySession.time/actual.keySession.distance)}/mi</span>`
+    : `<span style="color:var(--text-muted);">not yet logged this week</span>`;
   document.getElementById('thisWeekCard').innerHTML = `
     <div class="row1">
       <span class="phase-tag">Week ${wk.n} · ${wk.phase}</span>
@@ -330,7 +357,7 @@ function renderDashboard(){
     </div>
     <div class="stat-line"><span>${totalMi.toFixed(1)} mi logged</span><span>${wk.miles} mi target</span></div>
     <div class="bar-track"><div class="bar-fill ${over?'over':''}" style="width:${pct}%"></div></div>
-    <div class="workouts"><b>Long run:</b> ${wk.long>0? wk.long+' mi' : 'race week — see notes'}<br><b>Key session:</b> ${wk.work}</div>
+    <div class="workouts"><b>Long run:</b> ${wk.long>0? wk.long+' mi' : 'race week — see notes'}${longActualText}<br><b>Key session:</b> ${wk.work}<br>${keyActualText}</div>
   `;
 }
 
@@ -339,6 +366,26 @@ function renderPlan(){
   const list = document.getElementById('planList');
   list.innerHTML = PLAN.map(wk=>{
     const isCurrent = wk.n===wkNow.n;
+    const isPastOrCurrent = wk.n <= wkNow.n;
+
+    let actualHtml = '';
+    if(isPastOrCurrent){
+      const actual = getWeekActuals(wk);
+      const miColor = actual.totalMi >= wk.miles ? 'var(--green)' : (actual.totalMi >= wk.miles*0.7 ? 'var(--gold)' : 'var(--red)');
+      const longHtml = actual.longRun
+        ? `<span style="color:var(--green);">${actual.longRun.distance.toFixed(1)}mi @ ${secToPace(actual.longRun.time/actual.longRun.distance)}/mi</span>`
+        : (wk.long>0 ? `<span style="color:var(--text-muted);">not yet logged</span>` : '—');
+      const keyHtml = actual.keySession
+        ? `<span style="color:var(--green);">✓ ${TYPE_LABEL[actual.keySession.type]} ${actual.keySession.distance.toFixed(1)}mi @ ${secToPace(actual.keySession.time/actual.keySession.distance)}/mi</span>`
+        : `<span style="color:var(--text-muted);">not yet logged</span>`;
+      actualHtml = `
+        <div class="plan-actual">
+          <div class="pa-row"><span>Miles</span><span style="color:${miColor};">${actual.totalMi.toFixed(1)} / ${wk.miles} mi</span></div>
+          <div class="pa-row"><span>Long run</span>${longHtml}</div>
+          <div class="pa-row"><span>Key session</span>${keyHtml}</div>
+        </div>`;
+    }
+
     return `
       <div class="plan-week ${isCurrent?'current':''}">
         <div class="plan-week-head" onclick="togglePlanWeek(${wk.n})">
@@ -351,6 +398,7 @@ function renderPlan(){
         <div class="plan-week-body" id="pw-${wk.n}">
           <b>Long run:</b> ${wk.long>0? wk.long+' mi' : '—'}<br>
           <b>Key session:</b> ${wk.work}
+          ${actualHtml}
         </div>
       </div>`;
   }).join('');
