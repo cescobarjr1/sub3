@@ -97,8 +97,22 @@
   .type-race{background:#3a3020;color:var(--gold);}
   .run-item .stats{font-family:'JetBrains Mono',monospace;font-size:14px;margin-top:5px;}
   .run-item .stats .pace{color:var(--gold);font-weight:600;}
+  .run-item .stats .hr-badge{color:var(--red);}
   .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px;border:1px dashed var(--line);border-radius:var(--radius);}
   .synced-badge{font-size:10px;color:var(--green);letter-spacing:0.04em;text-transform:uppercase;margin-top:4px;}
+
+  .trend-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;margin-bottom:16px;}
+  .trend-chips{display:flex;gap:10px;margin-bottom:16px;}
+  .trend-chip{flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;}
+  .trend-chip .label{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
+  .trend-chip .value{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;}
+  .trend-chip .value.good{color:var(--green);}
+  .trend-chip .value.bad{color:var(--red);}
+  .trend-list{margin-top:14px;}
+  .trend-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--text-muted);}
+  .trend-row:last-child{border-bottom:none;}
+  .trend-row .d{color:var(--text);}
+  .trend-note{font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.5;}
 
   .plan-week{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden;}
   .plan-week.current{border-color:var(--gold-dim);}
@@ -160,6 +174,11 @@
     <div id="historyList" class="loading-state">Loading runs…</div>
   </section>
 
+  <section class="view" id="view-trends">
+    <div class="section-title">Long Run Heart Rate Trend</div>
+    <div id="trendsContent"></div>
+  </section>
+
   <section class="view" id="view-plan">
     <div class="section-title">16-Week Plan · Base → Peak → Taper</div>
     <div id="planList"></div>
@@ -176,6 +195,10 @@
   <button class="tab-btn" data-view="history">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
     History
+  </button>
+  <button class="tab-btn" data-view="trends">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
+    Trends
   </button>
   <button class="tab-btn" data-view="plan">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
@@ -196,22 +219,22 @@ const GOAL_PACE_SEC_PER_MI = GOAL_SECONDS / 26.2;
 
 /* ---------------- Training Plan ---------------- */
 const PLAN = [
-  {n:1,  start:'2026-08-17', phase:'Base',  miles:32, long:8,  work:'Tempo 3mi @ 6:35-6:45 within an easy run. Rest of week easy, conversational pace.'},
-  {n:2,  start:'2026-08-24', phase:'Base',  miles:35, long:10, work:'Strides 6x20s after an easy run. Long run fully easy.'},
-  {n:3,  start:'2026-08-31', phase:'Base',  miles:38, long:11, work:'Tempo 4mi @ 6:35-6:45. Build weekly volume steadily.'},
-  {n:4,  start:'2026-09-07', phase:'Cutback', miles:28, long:8, work:'Recovery week — easy running only, let the legs absorb the base.'},
-  {n:5,  start:'2026-09-14', phase:'Build', miles:40, long:12, work:'Intervals: 6x800m @ 6:00-6:10 w/ 400m jog recovery.'},
-  {n:6,  start:'2026-09-21', phase:'Build', miles:43, long:13, work:'Tempo 5mi @ 6:30-6:40. Long run steady, last 3mi at MP effort.'},
-  {n:7,  start:'2026-09-28', phase:'Build', miles:46, long:14, work:'Intervals: 5x1mi @ 6:10-6:20 w/ 2min jog.'},
-  {n:8,  start:'2026-10-05', phase:'Cutback', miles:34, long:10, work:'Recovery week — easy running, short strides only.'},
-  {n:9,  start:'2026-10-12', phase:'Peak',  miles:48, long:16, work:'Long run: last 4mi @ marathon pace (6:52). Midweek tempo 5mi.'},
-  {n:10, start:'2026-10-19', phase:'Peak',  miles:50, long:18, work:'Long run: 8mi @ marathon pace embedded. Intervals 6x800m mid-week.'},
-  {n:11, start:'2026-10-26', phase:'Peak',  miles:52, long:20, work:'The 20-miler — last 6mi @ marathon pace. This is your key confidence run.'},
-  {n:12, start:'2026-11-02', phase:'Cutback', miles:38, long:12, work:'Recovery week after the 20-miler. Easy running, stay loose.'},
-  {n:13, start:'2026-11-09', phase:'Peak',  miles:48, long:16, work:'Final big MP session: 10mi @ marathon pace within a long run.'},
-  {n:14, start:'2026-11-16', phase:'Taper', miles:36, long:12, work:'Volume drops, intensity stays sharp. Tempo 4mi @ MP-10s.'},
-  {n:15, start:'2026-11-23', phase:'Taper', miles:26, long:8,  work:'Short & easy with a few MP miles to stay sharp. Rest fully 2 days before next week.'},
-  {n:16, start:'2026-11-30', phase:'Race',  miles:30, long:0,  work:'Shakeouts of 2-3mi Tue/Thu/Fri. Race day Sunday Dec 6 — go get your sub-3.'},
+  {n:1,  start:'2026-08-17', phase:'Base',  miles:38, long:10, work:'Rebuilding consistency after a light week. Easy running, no more sub-15mi weeks from here.'},
+  {n:2,  start:'2026-08-24', phase:'Base',  miles:42, long:12, work:'Strides 6x20s after an easy run. Long run fully easy.'},
+  {n:3,  start:'2026-08-31', phase:'Base',  miles:46, long:13, work:'First marathon-pace work: 3mi @ 6:52 within the long run.'},
+  {n:4,  start:'2026-09-07', phase:'Cutback', miles:34, long:10, work:'Recovery week — easy running only, let the legs absorb the base.'},
+  {n:5,  start:'2026-09-14', phase:'Build', miles:48, long:14, work:'Long run: 4mi @ 6:52 (MP). Midweek tempo 5mi @ 6:35-6:45.'},
+  {n:6,  start:'2026-09-21', phase:'Build', miles:51, long:15, work:'Long run: 5mi @ MP. Intervals 6x800m @ 6:00-6:10.'},
+  {n:7,  start:'2026-09-28', phase:'Build', miles:54, long:16, work:'Long run: 6mi @ MP. Tempo 5mi @ 6:30-6:40.'},
+  {n:8,  start:'2026-10-05', phase:'Cutback', miles:40, long:11, work:'Recovery week — easy running, short strides only.'},
+  {n:9,  start:'2026-10-12', phase:'Peak',  miles:55, long:17, work:'Long run: 7mi @ MP. Midweek tempo 5mi.'},
+  {n:10, start:'2026-10-19', phase:'Peak',  miles:57, long:18, work:'Long run: 9mi @ MP. Intervals 6x800m mid-week.'},
+  {n:11, start:'2026-10-26', phase:'Peak',  miles:58, long:20, work:'The 20-miler — 10mi @ MP. Your key confidence run.'},
+  {n:12, start:'2026-11-02', phase:'Cutback', miles:42, long:12, work:'Recovery week after the 20-miler. Easy running, stay loose.'},
+  {n:13, start:'2026-11-09', phase:'Peak',  miles:54, long:16, work:'Biggest specific session: 11mi @ MP within the long run.'},
+  {n:14, start:'2026-11-16', phase:'Taper', miles:40, long:12, work:'Volume drops, intensity stays sharp. Tempo 4mi @ MP-10s.'},
+  {n:15, start:'2026-11-23', phase:'Taper', miles:30, long:8,  work:'Short & easy with a few MP miles to stay sharp. Rest fully 2 days before next week.'},
+  {n:16, start:'2026-11-30', phase:'Race',  miles:32, long:0,  work:'Shakeouts of 2-3mi Tue/Thu/Fri. Race day Sunday Dec 6 — go get your sub-3.'},
 ];
 
 function addDays(d, n){ const r = new Date(d); r.setDate(r.getDate()+n); return r; }
@@ -266,6 +289,7 @@ async function loadRuns(){
     time: r.time,
     notes: r.notes,
     source: r.source,
+    avgHeartrate: r.avg_heartrate || null,
   }));
 }
 
@@ -351,7 +375,7 @@ function renderHistory(){
       <div class="run-item">
         <div class="left">
           <div class="date">${dateStr}<span class="type-badge type-${r.type}">${TYPE_LABEL[r.type] || r.type}</span></div>
-          <div class="stats">${r.distance.toFixed(2)} mi · ${secToClock(r.time)} · <span class="pace">${secToPace(paceSec)}/mi</span></div>
+          <div class="stats">${r.distance.toFixed(2)} mi · ${secToClock(r.time)} · <span class="pace">${secToPace(paceSec)}/mi</span>${r.avgHeartrate ? ` · <span class="hr-badge">${r.avgHeartrate} bpm</span>` : ''}</div>
           ${r.notes? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${escapeHtml(r.notes)}</div>` : ''}
           <div class="synced-badge">Synced from Strava</div>
         </div>
@@ -362,6 +386,68 @@ function escapeHtml(s){
   const div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
+}
+
+function renderTrends(){
+  const content = document.getElementById('trendsContent');
+  const longRunsWithHR = RUNS
+    .filter(r => r.type === 'long' && r.avgHeartrate)
+    .slice()
+    .sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  if(longRunsWithHR.length === 0){
+    content.innerHTML = `<div class="empty-state">No heart rate data on long runs yet.<br>Once your device records HR on a synced long run, it'll show up here.</div>`;
+    return;
+  }
+
+  const hrs = longRunsWithHR.map(r => r.avgHeartrate);
+  const minHR = Math.min(...hrs) - 5;
+  const maxHR = Math.max(...hrs) + 5;
+  const latest = longRunsWithHR[longRunsWithHR.length-1];
+  const first = longRunsWithHR[0];
+  const delta = latest.avgHeartrate - first.avgHeartrate;
+
+  let chipsHtml = `
+    <div class="trend-chips">
+      <div class="trend-chip"><div class="label">Latest Long Run HR</div><div class="value">${latest.avgHeartrate} bpm</div></div>
+      <div class="trend-chip"><div class="label">Vs First Synced</div><div class="value ${delta<0?'good':(delta>0?'bad':'')}">${delta>0?'+':''}${delta} bpm</div></div>
+    </div>`;
+
+  let chartHtml = '';
+  if(longRunsWithHR.length >= 2){
+    const w = 600, h = 160, padX = 10, padY = 16;
+    const points = longRunsWithHR.map((r,i) => {
+      const x = padX + (i/(longRunsWithHR.length-1)) * (w - padX*2);
+      const y = padY + (1 - (r.avgHeartrate - minHR)/(maxHR - minHR)) * (h - padY*2);
+      return {x,y};
+    });
+    const pathD = points.map((p,i) => (i===0?'M':'L') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
+    const dots = points.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="var(--gold)"/>`).join('');
+    chartHtml = `
+      <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;margin:6px 0 4px;">
+        <path d="${pathD}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        ${dots}
+      </svg>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">
+        <span>${maxHR+5} bpm</span><span>${minHR-5} bpm</span>
+      </div>`;
+  }
+
+  const listHtml = longRunsWithHR.slice().reverse().map(r => {
+    const paceSec = r.time / r.distance;
+    const d = new Date(r.date+'T00:00:00');
+    const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return `<div class="trend-row"><span class="d">${dateStr} · ${r.distance.toFixed(1)}mi · ${secToPace(paceSec)}/mi</span><span>${r.avgHeartrate} bpm</span></div>`;
+  }).join('');
+
+  content.innerHTML = `
+    <div class="trend-card">
+      ${chipsHtml}
+      ${chartHtml}
+      <div class="trend-list">${listHtml}</div>
+    </div>
+    <div class="trend-note">This tracks average heart rate across your whole long run, not just the marathon-pace miles within it — treat it as a trend signal, not a precise readout. A flat or declining line while pace holds or improves is the sign your fitness is moving.</div>
+  `;
 }
 
 /* ---------------- Nav ---------------- */
@@ -383,6 +469,7 @@ async function refreshAll(){
   await loadRuns();
   renderDashboard();
   renderHistory();
+  renderTrends();
   btn.classList.remove('spinning');
   btn.textContent = 'Refresh';
 }
