@@ -27,6 +27,7 @@ module.exports = async (req, res) => {
     res.status(200).send('EVENT_RECEIVED');
 
     const event = req.body;
+    console.log('DEBUG webhook body:', typeof req.body, JSON.stringify(req.body));
 
     try {
       // Only care about newly created activities.
