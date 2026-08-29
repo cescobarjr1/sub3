@@ -1,5 +1,11 @@
 const { getSupabaseClient } = require('../../lib/supabase');
-const { getValidAccessToken, fetchActivity, mapActivityToRun } = require('../../lib/strava');
+const {
+  getValidAccessToken,
+  fetchActivity,
+  fetchActivityStreams,
+  computeMileSplits,
+  mapActivityToRun,
+} = require('../../lib/strava');
 
 module.exports = async (req, res) => {
   // --- Strava's one-time subscription verification (GET) ---
@@ -30,6 +36,17 @@ module.exports = async (req, res) => {
 
         if (activity.type === 'Run' || activity.sport_type === 'Run') {
           const run = mapActivityToRun(activity);
+
+          // Splits are a bonus on top of the base sync — never let a
+          // streams failure stop the run itself from being saved.
+          try {
+            const streams = await fetchActivityStreams(activity.id, accessToken);
+            run.splits = computeMileSplits(streams);
+          } catch (splitsErr) {
+            console.error('Failed to fetch/compute splits:', splitsErr.message);
+            run.splits = null;
+          }
+
           const supabase = getSupabaseClient();
 
           const { error } = await supabase
