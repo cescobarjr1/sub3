@@ -165,13 +165,13 @@
     </div>
 
     <div class="goal-row">
-      <div class="goal-chip accent"><div class="label">Goal Time</div><div class="value">2:59:59</div></div>
-      <div class="goal-chip accent"><div class="label">Goal Pace</div><div class="value">6:52/mi</div></div>
+      <div class="goal-chip accent"><div class="label">Goal Time</div><div class="value">2:55:00</div></div>
+      <div class="goal-chip accent"><div class="label">Goal Pace</div><div class="value">6:41/mi</div></div>
       <div class="goal-chip"><div class="label">This Week</div><div class="value" id="weekMiles">0 mi</div></div>
     </div>
 
     <div class="paceband-wrap">
-      <div class="paceband-title"><span>Sub-3 Pace Band</span><span class="tag">6:52 / mi</span></div>
+      <div class="paceband-title"><span>Goal Pace Band</span><span class="tag">6:41 / mi</span></div>
       <div class="paceband" id="pacebandRow"></div>
     </div>
 
@@ -193,7 +193,7 @@
   <section class="view" id="view-plan">
     <div class="section-title">16-Week Plan · Base → Peak → Taper</div>
     <div id="planList"></div>
-    <div class="goal-note">This is a starting template built around a 6:52/mi goal pace, peaking near a 52-mile week with a 20-miler three weeks out.</div>
+    <div class="goal-note">This plan is built around a 6:41/mi goal pace (2:55:00) — a real BQ-cushion stretch target, revisited as your mid-block fitness data comes in.</div>
   </section>
 
 </main>
@@ -225,16 +225,16 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ---------------- Config ---------------- */
 const RACE_DATE = new Date('2026-12-06T07:00:00');
-const GOAL_SECONDS = 2*3600 + 59*60 + 59;
+const GOAL_SECONDS = 2*3600 + 55*60 + 0;
 const GOAL_PACE_SEC_PER_MI = GOAL_SECONDS / 26.2;
 
 /* ---------------- Training Plan ---------------- */
 const PLAN = [
   {n:1,  start:'2026-08-17', phase:'Base',  miles:38, long:10, work:'Rebuilding consistency after a light week. Easy running, no more sub-15mi weeks from here.'},
   {n:2,  start:'2026-08-24', phase:'Base',  miles:42, long:12, work:'Strides 6x20s after an easy run. Long run fully easy.'},
-  {n:3,  start:'2026-08-31', phase:'Base',  miles:46, long:13, work:'First marathon-pace work: 3mi @ 6:52 within the long run.'},
+  {n:3,  start:'2026-08-31', phase:'Base',  miles:46, long:13, work:'First marathon-pace work: 3mi @ 6:41 within the long run.'},
   {n:4,  start:'2026-09-07', phase:'Cutback', miles:34, long:10, work:'Recovery week — easy running only, let the legs absorb the base.'},
-  {n:5,  start:'2026-09-14', phase:'Build', miles:48, long:14, work:'Long run: 4mi @ 6:52 (MP). Midweek tempo 5mi @ 6:35-6:45.'},
+  {n:5,  start:'2026-09-14', phase:'Build', miles:48, long:14, work:'Long run: 4mi @ 6:41 (MP). Midweek tempo 5mi @ 6:30-6:40.'},
   {n:6,  start:'2026-09-21', phase:'Build', miles:51, long:15, work:'Long run: 5mi @ MP. Intervals 6x800m @ 6:00-6:10.'},
   {n:7,  start:'2026-09-28', phase:'Build', miles:54, long:16, work:'Long run: 6mi @ MP. Tempo 5mi @ 6:30-6:40.'},
   {n:8,  start:'2026-10-05', phase:'Cutback', miles:40, long:11, work:'Recovery week — easy running, short strides only.'},
