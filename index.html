@@ -104,7 +104,9 @@
 
   .section-title{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin:24px 0 10px;}
 
-  .run-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .run-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;}
+  .run-item-head{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .run-item.expandable .run-item-head{cursor:pointer;}
   .run-item .left{flex:1;}
   .run-item .date{font-size:11px;color:var(--text-muted);letter-spacing:0.04em;}
   .run-item .type-badge{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;padding:2px 7px;border-radius:5px;margin-left:6px;position:relative;top:-1px;}
@@ -116,8 +118,20 @@
   .run-item .stats{font-family:'JetBrains Mono',monospace;font-size:14px;margin-top:5px;}
   .run-item .stats .pace{color:var(--gold);font-weight:600;}
   .run-item .stats .hr-badge{color:var(--red);}
+  .run-item .chevron{color:var(--text-muted);font-size:11px;transition:transform .2s ease;flex-shrink:0;}
+  .run-item .chevron.open{transform:rotate(180deg);}
   .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px;border:1px dashed var(--line);border-radius:var(--radius);}
   .synced-badge{font-size:10px;color:var(--green);letter-spacing:0.04em;text-transform:uppercase;margin-top:4px;}
+
+  .run-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+  .run-detail.open{display:block;}
+  .run-detail-title{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+  .split-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);}
+  .split-row:last-child{border-bottom:none;}
+  .split-row .mi{color:var(--text);font-family:'Inter',sans-serif;}
+  .split-row.spike{color:var(--red);}
+  .split-row.spike .mi{color:var(--red);}
+  .run-detail-note{font-size:11px;color:var(--red);margin-top:8px;line-height:1.4;}
 
   .trend-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;margin-bottom:16px;}
   .trend-chips{display:flex;gap:10px;margin-bottom:16px;}
@@ -244,6 +258,10 @@ const GOAL_PACE_SEC_PER_MI = GOAL_SECONDS / 26.2;
 // suspiciously close to (or under) goal pace for a day meant to be easy —
 // flagged so hard efforts don't quietly eat into recovery.
 const EASY_TOO_HARD_SEC_PER_MI = GOAL_PACE_SEC_PER_MI - 20;
+// A mile split whose avg HR runs this many bpm above that same run's own
+// overall average HR is flagged as a spike (a surge, not just the run
+// being harder overall).
+const HR_SPIKE_BPM = 10;
 
 /* ---------------- Training Plan ---------------- */
 const PLAN = [
@@ -382,6 +400,7 @@ async function loadRuns(){
     notes: r.notes,
     source: r.source,
     avgHeartrate: r.avg_heartrate || null,
+    splits: Array.isArray(r.splits) ? r.splits : null,
   }));
 }
 
@@ -514,6 +533,27 @@ function togglePlanWeek(n){ document.getElementById(`pw-${n}`).classList.toggle(
 
 const TYPE_LABEL = {easy:'Easy',tempo:'Tempo',long:'Long',speed:'Speed',race:'Race'};
 
+// A run's own overall avg HR to compare each split against — prefer the
+// stored whole-run value, fall back to averaging the splits' avg_hr if
+// that's ever missing.
+function runOverallAvgHr(r){
+  if(r.avgHeartrate) return r.avgHeartrate;
+  if(!r.splits || !r.splits.length) return null;
+  const withHr = r.splits.filter(s=>s.avg_hr!=null);
+  if(!withHr.length) return null;
+  return withHr.reduce((a,s)=>a+s.avg_hr,0)/withHr.length;
+}
+
+function renderSplitRows(r){
+  const baselineHr = runOverallAvgHr(r);
+  return r.splits.map(s=>{
+    const isSpike = baselineHr!=null && s.avg_hr!=null && (s.avg_hr - baselineHr) >= HR_SPIKE_BPM;
+    const paceStr = s.pace_sec!=null ? `${secToPace(s.pace_sec)}/mi` : '—';
+    const hrStr = s.avg_hr!=null ? `${s.avg_hr} bpm` : '—';
+    return `<div class="split-row ${isSpike?'spike':''}"><span class="mi">Mi ${s.mile}${isSpike?' ⚠':''}</span><span>${paceStr}</span><span>${hrStr}</span></div>`;
+  }).join('');
+}
+
 function renderHistory(){
   const list = document.getElementById('historyList');
   list.classList.remove('loading-state');
@@ -521,22 +561,53 @@ function renderHistory(){
     list.innerHTML = `<div class="empty-state">No runs synced yet.<br>Save a run in Strava and it'll show up here automatically.</div>`;
     return;
   }
+  // Re-rendering rebuilds every run's HTML, so remember which run details
+  // were expanded before this render and re-apply that after, rather than
+  // collapsing an open detail out from under the user on auto-refresh.
+  const openRunIds = new Set(
+    Array.from(document.querySelectorAll('.run-detail.open'))
+      .map(el => el.id.replace('rd-', ''))
+  );
+
   list.innerHTML = RUNS.map(r=>{
     const paceSec = (r.time/r.distance);
     const d = new Date(r.date+'T00:00:00');
     const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
     const isHardEasy = r.type==='easy' && isFinite(paceSec) && paceSec>0 && paceSec < EASY_TOO_HARD_SEC_PER_MI;
+    const hasSplits = Array.isArray(r.splits) && r.splits.length>0;
+    const isOpen = openRunIds.has(String(r.id));
+    const hasSpike = hasSplits && (() => {
+      const baseline = runOverallAvgHr(r);
+      return baseline!=null && r.splits.some(s=>s.avg_hr!=null && (s.avg_hr-baseline)>=HR_SPIKE_BPM);
+    })();
+
     return `
-      <div class="run-item">
-        <div class="left">
-          <div class="date">${dateStr}<span class="type-badge type-${r.type}">${TYPE_LABEL[r.type] || r.type}</span></div>
-          <div class="stats">${r.distance.toFixed(2)} mi · ${secToClock(r.time)} · <span class="pace">${secToPace(paceSec)}/mi</span>${r.avgHeartrate ? ` · <span class="hr-badge">${r.avgHeartrate} bpm</span>` : ''}</div>
-          ${r.notes? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${escapeHtml(r.notes)}</div>` : ''}
-          ${isHardEasy ? `<div class="warn-note">⚠ Faster than goal-pace cushion for an "easy" day — check effort</div>` : ''}
-          <div class="synced-badge">Synced from Strava</div>
+      <div class="run-item ${hasSplits?'expandable':''}">
+        <div class="run-item-head" ${hasSplits?`onclick="toggleRunDetail('${r.id}')"`:''}>
+          <div class="left">
+            <div class="date">${dateStr}<span class="type-badge type-${r.type}">${TYPE_LABEL[r.type] || r.type}</span></div>
+            <div class="stats">${r.distance.toFixed(2)} mi · ${secToClock(r.time)} · <span class="pace">${secToPace(paceSec)}/mi</span>${r.avgHeartrate ? ` · <span class="hr-badge">${r.avgHeartrate} bpm</span>` : ''}</div>
+            ${r.notes? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${escapeHtml(r.notes)}</div>` : ''}
+            ${isHardEasy ? `<div class="warn-note">⚠ Faster than goal-pace cushion for an "easy" day — check effort</div>` : ''}
+            <div class="synced-badge">Synced from Strava${hasSplits? ' · mile splits available':''}</div>
+          </div>
+          ${hasSplits ? `<span class="chevron ${isOpen?'open':''}">▾</span>` : ''}
         </div>
+        ${hasSplits ? `
+          <div class="run-detail ${isOpen?'open':''}" id="rd-${r.id}">
+            <div class="run-detail-title">Mile Splits</div>
+            ${renderSplitRows(r)}
+            ${hasSpike ? `<div class="run-detail-note">⚠ One or more miles ran notably hotter (HR) than this run's own average — could be a hill, a surge, or effort creeping up.</div>` : ''}
+          </div>` : ''}
       </div>`;
   }).join('');
+}
+function toggleRunDetail(id){
+  const el = document.getElementById(`rd-${id}`);
+  if(!el) return;
+  el.classList.toggle('open');
+  const chevron = el.previousElementSibling.querySelector('.chevron');
+  if(chevron) chevron.classList.toggle('open');
 }
 function escapeHtml(s){
   const div = document.createElement('div');
