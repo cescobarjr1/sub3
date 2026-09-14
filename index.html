@@ -223,6 +223,9 @@
   </section>
 
   <section class="view" id="view-trends">
+    <div class="section-title">Projected Marathon Time</div>
+    <div id="projTrendContent"></div>
+
     <div class="section-title">Long Run Heart Rate Trend</div>
     <div id="trendsContent"></div>
   </section>
@@ -330,9 +333,13 @@ function getWeekActuals(wk){
 }
 
 // Looks at the last few *completed* plan weeks (week already ended) and
-// compares planned vs. actual mileage, plus how long-run pace compares to
-// goal pace, to answer "am I actually on track for sub-3?" rather than
-// just displaying raw numbers.
+// compares planned vs. actual mileage to answer "am I actually on track
+// for sub-3?" Deliberately mileage-only: most long runs are prescribed
+// well slower than goal pace by design (easy running, or only a portion
+// at MP), so comparing a whole run's average pace to goal pace produces
+// false "behind" alarms during base/cutback weeks. Pace itself is still
+// visible per-run in History and as a trend in Trends — it's just not
+// used to drive this on-track/behind label.
 function computeOnTrackStatus(){
   const now = new Date();
   const completed = PLAN.filter(wk=>{
@@ -343,29 +350,19 @@ function computeOnTrackStatus(){
   if(completed.length===0) return null;
 
   let plannedMi = 0, actualMi = 0;
-  const paceDiffs = [];
   completed.forEach(wk=>{
     const actual = getWeekActuals(wk);
     plannedMi += wk.miles;
     actualMi += actual.totalMi;
-    if(actual.longRun && actual.longRun.time && actual.longRun.distance){
-      paceDiffs.push((actual.longRun.time/actual.longRun.distance) - GOAL_PACE_SEC_PER_MI);
-    }
   });
 
   const adherencePct = plannedMi>0 ? (actualMi/plannedMi)*100 : 0;
-  const avgPaceDiff = paceDiffs.length ? paceDiffs.reduce((a,b)=>a+b,0)/paceDiffs.length : null;
   const wkWord = completed.length>1 ? 'weeks' : 'week';
-  const paceClause = avgPaceDiff===null
-    ? ''
-    : (avgPaceDiff<=0
-        ? `, long runs averaging ${secToPace(Math.abs(avgPaceDiff))}/mi faster than goal pace`
-        : `, long runs averaging ${secToPace(avgPaceDiff)}/mi slower than goal pace`);
 
   let status;
-  if(adherencePct < 80 || (avgPaceDiff!==null && avgPaceDiff > 20)){
+  if(adherencePct < 80){
     status = 'behind';
-  } else if(adherencePct >= 95 && (avgPaceDiff===null || avgPaceDiff <= 5)){
+  } else if(adherencePct >= 95){
     status = 'ahead';
   } else {
     status = 'on-track';
@@ -373,7 +370,7 @@ function computeOnTrackStatus(){
 
   return {
     status,
-    message: `${adherencePct.toFixed(0)}% of planned mileage over the last ${completed.length} ${wkWord}${paceClause}.`,
+    message: `${adherencePct.toFixed(0)}% of planned mileage over the last ${completed.length} ${wkWord}.`,
   };
 }
 
@@ -705,6 +702,130 @@ function escapeHtml(s){
   return div.innerHTML;
 }
 
+// Minimum sustained distance, in miles, for a fast stretch within a run to
+// count as a real effort worth projecting from — long enough to be a
+// genuine tempo/threshold block, not just one naturally faster mile.
+const MIN_EFFORT_MILES = 2;
+// A stretch at or faster than this per-mile pace counts as hard-effort
+// pace — the same tempo threshold the Strava sync uses for a whole run.
+const EFFORT_PACE_MAX_SEC = PACE_TEMPO_MAX;
+
+// Scans a run's mile splits for the longest contiguous stretch of miles
+// each run at EFFORT_PACE_MAX_SEC or faster, regardless of how the whole
+// activity averages out (a warm-up/cool-down mile shouldn't hide a real
+// tempo block). Returns {distance, time} for that stretch — using each
+// split's own distance so a trailing partial mile is weighted correctly —
+// or null if no stretch of at least MIN_EFFORT_MILES qualifies.
+function findBestEffortSegment(run){
+  if(!run.splits || run.splits.length < 2) return null;
+
+  const splits = run.splits;
+  let best = null;
+  let i = 0;
+  while(i < splits.length){
+    if(splits[i].pace_sec == null || splits[i].pace_sec > EFFORT_PACE_MAX_SEC){
+      i++;
+      continue;
+    }
+    let j = i, segDist = 0, segTime = 0;
+    while(j < splits.length && splits[j].pace_sec != null && splits[j].pace_sec <= EFFORT_PACE_MAX_SEC){
+      const prevMile = j === 0 ? 0 : splits[j-1].mile;
+      const splitDist = splits[j].mile - prevMile;
+      segDist += splitDist;
+      segTime += splits[j].pace_sec * splitDist;
+      j++;
+    }
+    if(segDist >= MIN_EFFORT_MILES && (!best || segDist > best.distance)){
+      best = { distance: segDist, time: segTime };
+    }
+    i = j;
+  }
+  return best;
+}
+
+// Builds the qualifying-effort list behind the "Projected Marathon Time"
+// trend: for every run with mile splits, finds its best sustained fast
+// segment and, if one exists, projects a marathon time from it via the
+// Riegel formula (T2 = T1 * (D2/D1)^1.06) — the standard way to
+// extrapolate marathon capability from a shorter hard effort.
+function getEffortProjections(){
+  return RUNS
+    .slice()
+    .sort((a,b)=> new Date(a.date) - new Date(b.date))
+    .map(r=>{
+      const seg = findBestEffortSegment(r);
+      if(!seg) return null;
+      const projectedSec = seg.time * Math.pow(26.2/seg.distance, 1.06);
+      return {
+        date: r.date,
+        segDistance: seg.distance,
+        segTime: seg.time,
+        segPace: seg.time/seg.distance,
+        projectedSec,
+      };
+    })
+    .filter(Boolean);
+}
+
+function renderProjectionTrend(){
+  const content = document.getElementById('projTrendContent');
+  const projections = getEffortProjections();
+
+  if(projections.length === 0){
+    content.innerHTML = `<div class="empty-state">No qualifying tempo/speed efforts yet.<br>Once a run has a sustained 2+ mile stretch at tempo pace (6:50/mi) or faster, a projected marathon time will show up here.</div>`;
+    return;
+  }
+
+  const latest = projections[projections.length-1];
+  const goalDiff = latest.projectedSec - GOAL_SECONDS;
+
+  const chipsHtml = `
+    <div class="trend-chips">
+      <div class="trend-chip"><div class="label">Latest Projection</div><div class="value">${secToClock(latest.projectedSec)}</div></div>
+      <div class="trend-chip"><div class="label">Vs Goal (2:55:00)</div><div class="value ${goalDiff<=0?'good':'bad'}">${goalDiff<=0?'-':'+'}${secToClock(Math.abs(goalDiff))}</div></div>
+    </div>`;
+
+  let chartHtml = '';
+  if(projections.length >= 2){
+    const w = 600, h = 160, padX = 10, padY = 16;
+    const times = projections.map(p=>p.projectedSec);
+    const minT = Math.min(...times, GOAL_SECONDS) - 120;
+    const maxT = Math.max(...times, GOAL_SECONDS) + 120;
+    const points = projections.map((p,i)=>{
+      const x = padX + (i/(projections.length-1)) * (w - padX*2);
+      const y = padY + (1 - (p.projectedSec - minT)/(maxT - minT)) * (h - padY*2);
+      return {x,y};
+    });
+    const goalY = padY + (1 - (GOAL_SECONDS - minT)/(maxT - minT)) * (h - padY*2);
+    const pathD = points.map((p,i)=> (i===0?'M':'L') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
+    const dots = points.map(p=> `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="var(--gold)"/>`).join('');
+    chartHtml = `
+      <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;margin:6px 0 4px;">
+        <line x1="${padX}" y1="${goalY.toFixed(1)}" x2="${w-padX}" y2="${goalY.toFixed(1)}" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <path d="${pathD}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        ${dots}
+      </svg>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">
+        <span>Dashed line = 2:55:00 goal</span><span></span>
+      </div>`;
+  }
+
+  const listHtml = projections.slice().reverse().map(p=>{
+    const d = new Date(p.date+'T00:00:00');
+    const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return `<div class="trend-row"><span class="d">${dateStr} · ${p.segDistance.toFixed(1)}mi @ ${secToPace(p.segPace)}/mi effort</span><span>${secToClock(p.projectedSec)}</span></div>`;
+  }).join('');
+
+  content.innerHTML = `
+    <div class="trend-card">
+      ${chipsHtml}
+      ${chartHtml}
+      <div class="trend-list">${listHtml}</div>
+    </div>
+    <div class="trend-note">Projected from the fastest sustained 2+ mile stretch (tempo pace or faster) found within each run's mile splits, using the Riegel formula — a standard way to extrapolate marathon capability from a shorter hard effort. Treat it as a trend signal alongside your training, not a guarantee.</div>
+  `;
+}
+
 function renderTrends(){
   const content = document.getElementById('trendsContent');
   const longRunsWithHR = RUNS
@@ -786,6 +907,7 @@ async function refreshAll(){
   await loadRuns();
   renderDashboard();
   renderHistory();
+  renderProjectionTrend();
   renderTrends();
   renderPlan();
   btn.classList.remove('spinning');
