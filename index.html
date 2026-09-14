@@ -169,6 +169,19 @@
   .plan-chart-legend .sw.planned{background:var(--line);}
   .plan-chart-legend .sw.actual{background:var(--gold);}
 
+  .race-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+  .race-card.next{border-color:var(--gold-dim);background:linear-gradient(155deg, rgba(201,162,39,0.08), var(--surface));}
+  .race-card.done{opacity:0.55;}
+  .race-card .race-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .race-card .race-name{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;}
+  .race-card .race-date{font-size:12px;color:var(--text-muted);margin-top:3px;}
+  .race-card .race-days{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--gold);text-align:right;white-space:nowrap;}
+  .race-card .race-days .unit{display:block;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:500;font-family:'Inter',sans-serif;}
+  .race-card .race-meta{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .race-tag{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--line);}
+  .race-tag.next-tag{color:var(--gold);border-color:var(--gold-dim);}
+  .race-tag.done-tag{color:var(--green);border-color:#2f5f3f;}
+
   nav.tabbar{position:fixed;bottom:0;left:0;right:0;background:rgba(18,21,26,0.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:10;}
   nav.tabbar button{flex:1;background:none;border:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;padding:8px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
   nav.tabbar button svg{width:20px;height:20px;stroke:var(--text-muted);}
@@ -240,6 +253,12 @@
     <div class="goal-note">This plan is built around a 6:41/mi goal pace (2:55:00) — a real BQ-cushion stretch target, revisited as your mid-block fitness data comes in.</div>
   </section>
 
+  <section class="view" id="view-season">
+    <div class="section-title">2026–2027 Race Season</div>
+    <div id="seasonList"></div>
+    <div class="goal-note">Only CIM has a goal pace and training plan wired up so far — the rest are placeholders until each gets built out closer to race day.</div>
+  </section>
+
 </main>
 
 <nav class="tabbar">
@@ -258,6 +277,10 @@
   <button class="tab-btn" data-view="plan">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
     Plan
+  </button>
+  <button class="tab-btn" data-view="season">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V3"/><path d="M5 4h13l-2.5 4L18 12H5"/></svg>
+    Season
   </button>
 </nav>
 
@@ -412,6 +435,59 @@ function secToClock(sec){
   const s = sec%60;
   if(h>0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
   return `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+/* ---------------- Season ---------------- */
+// The full 2026-2027 race calendar. CIM is the only one with a goal pace
+// and training plan wired up right now (see PLAN above) — the rest are
+// deliberately just placeholders until each gets built out closer to its
+// own race day.
+const RACES = [
+  { name:'California International Marathon', date:'2026-12-06', location:'Sacramento, CA', distanceLabel:'Marathon · 26.2mi', goalTime: GOAL_SECONDS },
+  { name:'Ventura Marathon', date:'2027-02-21', location:'Ventura, CA', distanceLabel:'Marathon · 26.2mi', goalTime: null },
+  { name:'Way Too Cool 50K', date:'2027-03-06', location:'Cool, CA', distanceLabel:'Trail Ultra · 50k (~31.1mi)', goalTime: null },
+  { name:'San Diego Marathon', date:'2027-06-06', location:'San Diego, CA', distanceLabel:'Marathon · 26.2mi', goalTime: null },
+];
+
+function renderSeason(){
+  const el = document.getElementById('seasonList');
+  if(!el) return;
+  const now = new Date();
+  const sorted = RACES.slice().sort((a,b)=> new Date(a.date) - new Date(b.date));
+  const nextRace = sorted.find(r => new Date(r.date+'T00:00:00') >= now);
+
+  el.innerHTML = sorted.map(r=>{
+    const raceDate = new Date(r.date+'T00:00:00');
+    const isDone = raceDate < now;
+    const isNext = !!nextRace && r.date === nextRace.date;
+    const daysOut = Math.ceil((raceDate - now) / (1000*60*60*24));
+
+    const daysHtml = isDone
+      ? `<div class="race-days" style="color:var(--green);">✓<span class="unit">Done</span></div>`
+      : `<div class="race-days">${daysOut}<span class="unit">days</span></div>`;
+
+    const dateStr = raceDate.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    const goalHtml = r.goalTime
+      ? `<span class="race-tag next-tag">Goal ${secToClock(r.goalTime)}</span>`
+      : `<span class="race-tag">Goal TBD</span>`;
+
+    return `
+      <div class="race-card ${isNext?'next':''} ${isDone?'done':''}">
+        <div class="race-row1">
+          <div>
+            <div class="race-name">${r.name}</div>
+            <div class="race-date">${dateStr} · ${r.location}</div>
+          </div>
+          ${daysHtml}
+        </div>
+        <div class="race-meta">
+          <span class="race-tag">${r.distanceLabel}</span>
+          ${goalHtml}
+          ${isNext ? `<span class="race-tag next-tag">Next Up</span>` : ''}
+          ${isDone ? `<span class="race-tag done-tag">Completed</span>` : ''}
+        </div>
+      </div>`;
+  }).join('');
 }
 
 /* ---------------- Data ---------------- */
@@ -914,6 +990,7 @@ async function refreshAll(){
   renderProjectionTrend();
   renderTrends();
   renderPlan();
+  renderSeason();
   btn.classList.remove('spinning');
   btn.textContent = 'Refresh';
 }
