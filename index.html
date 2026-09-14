@@ -64,6 +64,7 @@
   .countdown-big .unit{font-size:16px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.08em;}
   .countdown-meta{margin-top:10px;font-size:13px;color:var(--text-muted);}
   .countdown-meta b{color:var(--text);font-weight:600;}
+  .streak-pill{margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:rgba(201,162,39,0.12);border:1px solid var(--gold-dim);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--gold);font-weight:600;}
 
   .status-card{border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px;}
   .status-card .status-label{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
@@ -99,6 +100,8 @@
   .bar-fill{height:100%;background:linear-gradient(90deg, var(--gold-dim), var(--gold));border-radius:6px;transition:width .4s ease;}
   .bar-fill.over{background:linear-gradient(90deg, #3b7f52, var(--green));}
   .week-card .stat-line{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:6px;}
+  .week-card .progress-note{font-size:11px;color:var(--text-muted);margin-top:6px;}
+  .week-card .progress-note.hit{color:var(--green);font-weight:600;}
   .week-card .workouts{margin-top:12px;font-size:12.5px;color:var(--text-muted);line-height:1.5;}
   .week-card .workouts b{color:var(--text);font-weight:600;}
 
@@ -160,6 +163,12 @@
   .pa-row span:first-child{color:var(--text-muted);flex-shrink:0;}
   .pa-row span:last-child{text-align:right;}
 
+  .plan-chart-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 14px 10px;margin-bottom:14px;}
+  .plan-chart-legend{display:flex;gap:16px;font-size:11px;color:var(--text-muted);margin-bottom:10px;}
+  .plan-chart-legend .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+  .plan-chart-legend .sw.planned{background:var(--line);}
+  .plan-chart-legend .sw.actual{background:var(--gold);}
+
   nav.tabbar{position:fixed;bottom:0;left:0;right:0;background:rgba(18,21,26,0.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:10;}
   nav.tabbar button{flex:1;background:none;border:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;padding:8px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
   nav.tabbar button svg{width:20px;height:20px;stroke:var(--text-muted);}
@@ -187,6 +196,7 @@
       <div class="eyebrow">Race Day Countdown</div>
       <div class="countdown-big"><span id="daysLeft">--</span><span class="unit">days<br>to CIM</span></div>
       <div class="countdown-meta"><b id="weeksLeft">--</b> weeks of training remaining · currently <b id="currentPhase">—</b></div>
+      <div class="streak-pill" id="streakPill" style="display:none;"></div>
     </div>
 
     <div class="goal-row">
@@ -219,6 +229,10 @@
 
   <section class="view" id="view-plan">
     <div class="section-title">16-Week Plan · Base → Peak → Taper</div>
+    <div class="plan-chart-wrap">
+      <div class="plan-chart-legend"><span><i class="sw planned"></i>Planned</span><span><i class="sw actual"></i>Actual</span></div>
+      <div id="planChart"></div>
+    </div>
     <div id="planList"></div>
     <div class="goal-note">This plan is built around a 6:41/mi goal pace (2:55:00) — a real BQ-cushion stretch target, revisited as your mid-block fitness data comes in.</div>
   </section>
@@ -269,17 +283,17 @@ const PLAN = [
   {n:2,  start:'2026-08-24', phase:'Base',  miles:42, long:12, work:'Strides 6x20s after an easy run. Long run fully easy.'},
   {n:3,  start:'2026-08-31', phase:'Base',  miles:46, long:13, work:'First marathon-pace work: 3mi @ 6:41 within the long run.'},
   {n:4,  start:'2026-09-07', phase:'Cutback', miles:34, long:10, work:'Recovery week — easy running only, let the legs absorb the base.'},
-  {n:5,  start:'2026-09-14', phase:'Build', miles:48, long:14, work:'Long run: 4mi @ 6:41 (MP). Midweek tempo 5mi @ 6:30-6:40.'},
-  {n:6,  start:'2026-09-21', phase:'Build', miles:51, long:15, work:'Long run: 5mi @ MP. Intervals 6x800m @ 6:00-6:10.'},
-  {n:7,  start:'2026-09-28', phase:'Build', miles:54, long:16, work:'Long run: 6mi @ MP. Tempo 5mi @ 6:25-6:35 — a touch faster than weeks 5-6.'},
-  {n:8,  start:'2026-10-05', phase:'Cutback', miles:40, long:11, work:'Recovery week — easy running, short strides only.'},
-  {n:9,  start:'2026-10-12', phase:'Peak',  miles:55, long:17, work:'Long run: 7mi @ MP. Midweek tempo 5mi @ 6:20-6:30 — threshold should be moving now.'},
-  {n:10, start:'2026-10-19', phase:'Peak',  miles:57, long:18, work:'Long run: 9mi @ MP. Intervals 6x800m @ 5:55-6:05 mid-week.'},
-  {n:11, start:'2026-10-26', phase:'Peak',  miles:58, long:20, work:'The 20-miler — 10mi @ MP. Your key confidence run.'},
-  {n:12, start:'2026-11-02', phase:'Cutback', miles:42, long:12, work:'Recovery week after the 20-miler. Easy running, stay loose.'},
-  {n:13, start:'2026-11-09', phase:'Peak',  miles:54, long:16, work:'Biggest specific session: 11mi @ MP within the long run.'},
-  {n:14, start:'2026-11-16', phase:'Taper', miles:40, long:12, work:'Volume drops, intensity stays sharp. Tempo 4mi @ MP-10s.'},
-  {n:15, start:'2026-11-23', phase:'Taper', miles:30, long:8,  work:'Short & easy with a few MP miles to stay sharp. Rest fully 2 days before next week.'},
+  {n:5,  start:'2026-09-14', phase:'Build', miles:50, long:15, work:'Long run: 4mi @ 6:41 (MP). Midweek tempo 5mi @ 6:30-6:40.'},
+  {n:6,  start:'2026-09-21', phase:'Build', miles:54, long:16, work:'Long run: 5mi @ MP. Intervals 6x800m @ 6:00-6:10.'},
+  {n:7,  start:'2026-09-28', phase:'Build', miles:57, long:17, work:'Long run: 6mi @ MP. Tempo 5mi @ 6:25-6:35 — a touch faster than weeks 5-6.'},
+  {n:8,  start:'2026-10-05', phase:'Cutback', miles:42, long:12, work:'Recovery week — easy running, short strides only.'},
+  {n:9,  start:'2026-10-12', phase:'Peak',  miles:58, long:18, work:'Long run: 7mi @ MP. Midweek tempo 5mi @ 6:20-6:30 — threshold should be moving now.'},
+  {n:10, start:'2026-10-19', phase:'Peak',  miles:60, long:19, work:'Long run: 9mi @ MP. Intervals 6x800m @ 5:55-6:05 mid-week.'},
+  {n:11, start:'2026-10-26', phase:'Peak',  miles:62, long:20, work:'The 20-miler — 10mi @ MP. Your key confidence run.'},
+  {n:12, start:'2026-11-02', phase:'Cutback', miles:44, long:13, work:'Recovery week after the 20-miler. Easy running, stay loose.'},
+  {n:13, start:'2026-11-09', phase:'Peak',  miles:58, long:17, work:'Biggest specific session: 11mi @ MP within the long run.'},
+  {n:14, start:'2026-11-16', phase:'Taper', miles:42, long:12, work:'Volume drops, intensity stays sharp. Tempo 4mi @ MP-10s.'},
+  {n:15, start:'2026-11-23', phase:'Taper', miles:32, long:8,  work:'Short & easy with a few MP miles to stay sharp. Rest fully 2 days before next week.'},
   {n:16, start:'2026-11-30', phase:'Race',  miles:32, long:0,  work:'Shakeouts of 2-3mi Tue/Thu/Fri. Race day Sunday Dec 6 — go get your 2:55.'},
 ];
 
@@ -363,6 +377,27 @@ function computeOnTrackStatus(){
   };
 }
 
+// Counts consecutive completed weeks, most recent first, where actual
+// mileage hit at least 90% of that week's planned target. Breaks on the
+// first miss, so it's the current unbroken streak, not a lifetime best.
+function computeAdherenceStreak(){
+  const now = new Date();
+  const completed = PLAN.filter(wk=>{
+    const weekEnd = addDays(new Date(wk.start+'T00:00:00'), 6);
+    return weekEnd < now;
+  });
+  let streak = 0;
+  for(let i=completed.length-1;i>=0;i--){
+    const actual = getWeekActuals(completed[i]);
+    if(actual.totalMi >= completed[i].miles*0.9){
+      streak++;
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 function secToPace(sec){
   if(!isFinite(sec) || sec<=0) return '—:—';
   const m = Math.floor(sec/60);
@@ -417,6 +452,7 @@ function renderDashboard(){
   document.getElementById('currentPhase').textContent = wk.phase + ' phase';
 
   renderStatusCard();
+  renderStreak();
 
   const markers = [5,10,13.1,15,20,25,26.2];
   const row = document.getElementById('pacebandRow');
@@ -436,6 +472,9 @@ function renderDashboard(){
 
   const pct = Math.min(100, (totalMi/wk.miles)*100);
   const over = totalMi >= wk.miles;
+  const progressText = over
+    ? `🎉 Goal hit for the week`
+    : `${(wk.miles-totalMi).toFixed(1)} mi to go`;
   const actual = getWeekActuals(wk);
   const longActualText = actual.longRun
     ? ` — <span style="color:var(--green);">ran ${actual.longRun.distance.toFixed(1)}mi @ ${secToPace(actual.longRun.time/actual.longRun.distance)}/mi</span>`
@@ -450,8 +489,20 @@ function renderDashboard(){
     </div>
     <div class="stat-line"><span>${totalMi.toFixed(1)} mi logged</span><span>${wk.miles} mi target</span></div>
     <div class="bar-track"><div class="bar-fill ${over?'over':''}" style="width:${pct}%"></div></div>
+    <div class="progress-note ${over?'hit':''}">${progressText}</div>
     <div class="workouts"><b>Long run:</b> ${wk.long>0? wk.long+' mi' : 'race week — see notes'}${longActualText}<br><b>Key session:</b> ${wk.work}<br>${keyActualText}</div>
   `;
+}
+
+function renderStreak(){
+  const pill = document.getElementById('streakPill');
+  const streak = computeAdherenceStreak();
+  if(streak < 2){
+    pill.style.display = 'none';
+    return;
+  }
+  pill.style.display = 'inline-flex';
+  pill.textContent = `🔥 ${streak}-week streak`;
 }
 
 function renderStatusCard(){
@@ -470,7 +521,46 @@ function renderStatusCard(){
   `;
 }
 
+// Grouped bar chart of planned vs. actual mileage across all 16 weeks, so
+// the shape of the whole block — and where it diverges from plan — is
+// visible at a glance instead of only in the 3-week rolling status card or
+// one expanded week at a time below.
+function renderPlanChart(){
+  const el = document.getElementById('planChart');
+  if(!el) return;
+  const now = new Date();
+  const w = 600, h = 150, padX = 6, padTop = 8, padBottom = 16;
+  const n = PLAN.length;
+  const actuals = PLAN.map(wk=>getWeekActuals(wk).totalMi);
+  const maxMi = Math.max(...PLAN.map(wk=>wk.miles), ...actuals) * 1.08;
+  const groupW = (w - padX*2)/n;
+  const barW = groupW*0.34;
+  const gap = groupW*0.08;
+  const chartH = h - padTop - padBottom;
+
+  let bars = '';
+  PLAN.forEach((wk,i)=>{
+    const started = new Date(wk.start+'T00:00:00') <= now;
+    const gx = padX + i*groupW;
+
+    const plannedH = (wk.miles/maxMi)*chartH;
+    bars += `<rect x="${(gx+gap).toFixed(1)}" y="${(h-padBottom-plannedH).toFixed(1)}" width="${barW.toFixed(1)}" height="${plannedH.toFixed(1)}" fill="var(--line)" rx="2"/>`;
+
+    if(started){
+      const actualMi = actuals[i];
+      const actualH = (actualMi/maxMi)*chartH;
+      const color = actualMi >= wk.miles ? 'var(--green)' : (actualMi >= wk.miles*0.7 ? 'var(--gold)' : 'var(--red)');
+      bars += `<rect x="${(gx+gap+barW+2).toFixed(1)}" y="${(h-padBottom-actualH).toFixed(1)}" width="${barW.toFixed(1)}" height="${actualH.toFixed(1)}" fill="${color}" rx="2"/>`;
+    }
+
+    bars += `<text x="${(gx+groupW/2).toFixed(1)}" y="${h-4}" font-size="8" fill="var(--text-muted)" text-anchor="middle">${wk.n}</text>`;
+  });
+
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;">${bars}</svg>`;
+}
+
 function renderPlan(){
+  renderPlanChart();
   const wkNow = currentWeek();
   const list = document.getElementById('planList');
   // Re-rendering rebuilds every week row's HTML (needed so actuals reflect
