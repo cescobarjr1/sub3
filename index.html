@@ -279,6 +279,10 @@ const EASY_TOO_HARD_SEC_PER_MI = GOAL_PACE_SEC_PER_MI - 20;
 // overall average HR is flagged as a spike (a surge, not just the run
 // being harder overall).
 const HR_SPIKE_BPM = 10;
+// Tempo-or-faster pace threshold, in sec/mi — mirrors lib/strava.js's
+// PACE_TEMPO_MAX (a separate, backend-only file not loaded by this page),
+// used here to find hard-effort segments within a run's mile splits.
+const PACE_TEMPO_MAX = 410;
 
 /* ---------------- Training Plan ---------------- */
 const PLAN = [
