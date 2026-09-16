@@ -15,273 +15,277 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root{
-    --bg:#12151A;
-    --surface:#1B1F26;
-    --surface-2:#232833;
-    --line:#2C323D;
-    --text:#F2F1ED;
-    --text-muted:#8A8F98;
-    --gold:#C9A227;
-    --gold-dim:#8f7420;
-    --red:#C1432B;
-    --green:#4F9D69;
-    --radius:14px;
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
-  body{min-height:100vh;padding-bottom:88px;-webkit-font-smoothing:antialiased;}
-  .display{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.02em;}
-  .mono{font-family:'JetBrains Mono',monospace;}
+:root{
+--bg:#12151A;
+--surface:#1B1F26;
+--surface-2:#232833;
+--line:#2C323D;
+--text:#F2F1ED;
+--text-muted:#8A8F98;
+--gold:#C9A227;
+--gold-dim:#8f7420;
+--red:#C1432B;
+--green:#4F9D69;
+--radius:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
+body{min-height:100vh;padding-bottom:88px;-webkit-font-smoothing:antialiased;}
+.display{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.02em;}
+.mono{font-family:'JetBrains Mono',monospace;}
 
-  header.top{
-    padding:22px 20px 14px;
-    display:flex;align-items:baseline;justify-content:space-between;
-    border-bottom:1px solid var(--line);
-  }
-  header.top .brand{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;}
-  header.top .brand span{color:var(--gold);}
-  header.top .sub{font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;}
-  .refresh-btn{
-    background:none;border:1px solid var(--line);border-radius:8px;
-    color:var(--text-muted);padding:6px 10px;font-size:11px;
-    letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;
-  }
-  .refresh-btn.spinning{color:var(--gold);}
+header.top{
+padding:22px 20px 14px;
+display:flex;align-items:baseline;justify-content:space-between;
+border-bottom:1px solid var(--line);
+}
+header.top .brand{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;}
+header.top .brand span{color:var(--gold);}
+header.top .sub{font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;}
+.refresh-btn{
+background:none;border:1px solid var(--line);border-radius:8px;
+color:var(--text-muted);padding:6px 10px;font-size:11px;
+letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;
+}
+.refresh-btn.spinning{color:var(--gold);}
 
-  main{max-width:640px;margin:0 auto;padding:18px 16px 8px;}
-  .view{display:none;animation:fade .25s ease;}
-  .view.active{display:block;}
-  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+main{max-width:640px;margin:0 auto;padding:18px 16px 8px;}
+.view{display:none;animation:fade .25s ease;}
+.view.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
 
-  .countdown-card{
-    background:linear-gradient(155deg, var(--surface) 0%, var(--surface-2) 100%);
-    border:1px solid var(--line);border-radius:var(--radius);
-    padding:22px 20px;margin-bottom:16px;
-  }
-  .countdown-card .eyebrow{font-size:11px;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;}
-  .countdown-big{font-family:'Oswald',sans-serif;font-size:64px;font-weight:700;line-height:0.95;color:var(--gold);display:flex;align-items:baseline;gap:10px;}
-  .countdown-big .unit{font-size:16px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.08em;}
-  .countdown-meta{margin-top:10px;font-size:13px;color:var(--text-muted);}
-  .countdown-meta b{color:var(--text);font-weight:600;}
-  .streak-pill{margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:rgba(201,162,39,0.12);border:1px solid var(--gold-dim);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--gold);font-weight:600;}
+.countdown-card{
+background:linear-gradient(155deg, var(--surface) 0%, var(--surface-2) 100%);
+border:1px solid var(--line);border-radius:var(--radius);
+padding:22px 20px;margin-bottom:16px;
+}
+.countdown-card .eyebrow{font-size:11px;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;}
+.countdown-big{font-family:'Oswald',sans-serif;font-size:64px;font-weight:700;line-height:0.95;color:var(--gold);display:flex;align-items:baseline;gap:10px;}
+.countdown-big .unit{font-size:16px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.08em;}
+.countdown-meta{margin-top:10px;font-size:13px;color:var(--text-muted);}
+.countdown-meta b{color:var(--text);font-weight:600;}
+.streak-pill{margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:rgba(201,162,39,0.12);border:1px solid var(--gold-dim);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--gold);font-weight:600;}
 
-  .status-card{border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px;}
-  .status-card .status-label{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
-  .status-card .status-msg{font-size:12.5px;color:var(--text-muted);line-height:1.5;}
-  .status-ahead{background:linear-gradient(155deg, rgba(79,157,105,0.12), var(--surface));border-color:#2f5f3f;}
-  .status-ahead .status-label{color:var(--green);}
-  .status-on-track{background:linear-gradient(155deg, rgba(201,162,39,0.10), var(--surface));border-color:var(--gold-dim);}
-  .status-on-track .status-label{color:var(--gold);}
-  .status-behind{background:linear-gradient(155deg, rgba(193,67,43,0.12), var(--surface));border-color:#6e2c1f;}
-  .status-behind .status-label{color:var(--red);}
-  .warn-note{font-size:11px;color:var(--red);margin-top:4px;line-height:1.4;}
+.status-card{border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px;}
+.status-card .status-label{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.status-card .status-msg{font-size:12.5px;color:var(--text-muted);line-height:1.5;}
+.status-ahead{background:linear-gradient(155deg, rgba(79,157,105,0.12), var(--surface));border-color:#2f5f3f;}
+.status-ahead .status-label{color:var(--green);}
+.status-on-track{background:linear-gradient(155deg, rgba(201,162,39,0.10), var(--surface));border-color:var(--gold-dim);}
+.status-on-track .status-label{color:var(--gold);}
+.status-behind{background:linear-gradient(155deg, rgba(193,67,43,0.12), var(--surface));border-color:#6e2c1f;}
+.status-behind .status-label{color:var(--red);}
+.warn-note{font-size:11px;color:var(--red);margin-top:4px;line-height:1.4;}
 
-  .goal-row{display:flex;gap:10px;margin-bottom:16px;}
-  .goal-chip{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 14px;text-align:center;}
-  .goal-chip .label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
-  .goal-chip .value{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;color:var(--text);}
-  .goal-chip.accent .value{color:var(--gold);}
+.goal-row{display:flex;gap:10px;margin-bottom:16px;}
+.goal-chip{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 14px;text-align:center;}
+.goal-chip .label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
+.goal-chip .value{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;color:var(--text);}
+.goal-chip.accent .value{color:var(--gold);}
 
-  .paceband-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px 16px;margin-bottom:16px;}
-  .paceband-title{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;display:flex;justify-content:space-between;}
-  .paceband-title .tag{color:var(--gold);}
-  .paceband{display:flex;border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);padding:10px 0;}
-  .paceband .mark{flex:1;text-align:center;border-right:1px dashed var(--line);padding:0 4px;}
-  .paceband .mark:last-child{border-right:none;}
-  .paceband .mark .mi{font-size:10px;color:var(--text-muted);letter-spacing:0.06em;}
-  .paceband .mark .t{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--text);margin-top:3px;}
+.paceband-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px 16px;margin-bottom:16px;}
+.paceband-title{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;display:flex;justify-content:space-between;}
+.paceband-title .tag{color:var(--gold);}
+.paceband{display:flex;border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);padding:10px 0;}
+.paceband .mark{flex:1;text-align:center;border-right:1px dashed var(--line);padding:0 4px;}
+.paceband .mark:last-child{border-right:none;}
+.paceband .mark .mi{font-size:10px;color:var(--text-muted);letter-spacing:0.06em;}
+.paceband .mark .t{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--text);margin-top:3px;}
 
-  .week-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
-  .week-card .row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-  .week-card .phase-tag{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--surface-2);color:var(--gold);border:1px solid var(--gold-dim);}
-  .week-card .mi-label{font-size:12px;color:var(--text-muted);}
-  .bar-track{height:10px;background:var(--surface-2);border-radius:6px;overflow:hidden;margin-top:6px;}
-  .bar-fill{height:100%;background:linear-gradient(90deg, var(--gold-dim), var(--gold));border-radius:6px;transition:width .4s ease;}
-  .bar-fill.over{background:linear-gradient(90deg, #3b7f52, var(--green));}
-  .week-card .stat-line{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:6px;}
-  .week-card .progress-note{font-size:11px;color:var(--text-muted);margin-top:6px;}
-  .week-card .progress-note.hit{color:var(--green);font-weight:600;}
-  .week-card .workouts{margin-top:12px;font-size:12.5px;color:var(--text-muted);line-height:1.5;}
-  .week-card .workouts b{color:var(--text);font-weight:600;}
+.week-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+.week-card .row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.week-card .phase-tag{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--surface-2);color:var(--gold);border:1px solid var(--gold-dim);}
+.week-card .mi-label{font-size:12px;color:var(--text-muted);}
+.bar-track{height:10px;background:var(--surface-2);border-radius:6px;overflow:hidden;margin-top:6px;}
+.bar-fill{height:100%;background:linear-gradient(90deg, var(--gold-dim), var(--gold));border-radius:6px;transition:width .4s ease;}
+.bar-fill.over{background:linear-gradient(90deg, #3b7f52, var(--green));}
+.week-card .stat-line{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:6px;}
+.week-card .progress-note{font-size:11px;color:var(--text-muted);margin-top:6px;}
+.week-card .progress-note.hit{color:var(--green);font-weight:600;}
+.week-card .workouts{margin-top:12px;font-size:12.5px;color:var(--text-muted);line-height:1.5;}
+.week-card .workouts b{color:var(--text);font-weight:600;}
+.week-card .key-session-row{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);}
+.week-card .key-session-row:first-child{border-top:none;padding-top:0;}
 
-  .section-title{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin:24px 0 10px;}
+.section-title{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin:24px 0 10px;}
 
-  .run-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;}
-  .run-item-head{display:flex;justify-content:space-between;align-items:center;gap:10px;}
-  .run-item.expandable .run-item-head{cursor:pointer;}
-  .run-item .left{flex:1;}
-  .run-item .date{font-size:11px;color:var(--text-muted);letter-spacing:0.04em;}
-  .run-item .type-badge{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;padding:2px 7px;border-radius:5px;margin-left:6px;position:relative;top:-1px;}
-  .type-easy{background:#22303a;color:#7fb5cc;}
-  .type-tempo{background:#3a2a20;color:#e0a05f;}
-  .type-long{background:#2a2038;color:#b294e6;}
-  .type-speed{background:#3a2020;color:var(--red);}
-  .type-race{background:#3a3020;color:var(--gold);}
-  .run-item .stats{font-family:'JetBrains Mono',monospace;font-size:14px;margin-top:5px;}
-  .run-item .stats .pace{color:var(--gold);font-weight:600;}
-  .run-item .stats .hr-badge{color:var(--red);}
-  .run-item .chevron{color:var(--text-muted);font-size:11px;transition:transform .2s ease;flex-shrink:0;}
-  .run-item .chevron.open{transform:rotate(180deg);}
-  .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px;border:1px dashed var(--line);border-radius:var(--radius);}
-  .synced-badge{font-size:10px;color:var(--green);letter-spacing:0.04em;text-transform:uppercase;margin-top:4px;}
+.run-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;}
+.run-item-head{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.run-item.expandable .run-item-head{cursor:pointer;}
+.run-item .left{flex:1;}
+.run-item .date{font-size:11px;color:var(--text-muted);letter-spacing:0.04em;}
+.run-item .type-badge{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;padding:2px 7px;border-radius:5px;margin-left:6px;position:relative;top:-1px;cursor:pointer;}
+.type-easy{background:#22303a;color:#7fb5cc;}
+.type-tempo{background:#3a2a20;color:#e0a05f;}
+.type-long{background:#2a2038;color:#b294e6;}
+.type-speed{background:#3a2020;color:var(--red);}
+.type-race{background:#3a3020;color:var(--gold);}
+.type-picker{position:absolute;z-index:30;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:3px;box-shadow:0 8px 20px rgba(0,0,0,0.45);}
+.type-picker .type-badge{margin-left:0;white-space:nowrap;}
+.run-item .stats{font-family:'JetBrains Mono',monospace;font-size:14px;margin-top:5px;}
+.run-item .stats .pace{color:var(--gold);font-weight:600;}
+.run-item .stats .hr-badge{color:var(--red);}
+.run-item .chevron{color:var(--text-muted);font-size:11px;transition:transform .2s ease;flex-shrink:0;}
+.run-item .chevron.open{transform:rotate(180deg);}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px;border:1px dashed var(--line);border-radius:var(--radius);}
+.synced-badge{font-size:10px;color:var(--green);letter-spacing:0.04em;text-transform:uppercase;margin-top:4px;}
 
-  .run-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
-  .run-detail.open{display:block;}
-  .run-detail-title{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
-  .split-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);}
-  .split-row:last-child{border-bottom:none;}
-  .split-row .mi{color:var(--text);font-family:'Inter',sans-serif;}
-  .split-row.spike{color:var(--red);}
-  .split-row.spike .mi{color:var(--red);}
-  .run-detail-note{font-size:11px;color:var(--red);margin-top:8px;line-height:1.4;}
+.run-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+.run-detail.open{display:block;}
+.run-detail-title{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+.split-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);}
+.split-row:last-child{border-bottom:none;}
+.split-row .mi{color:var(--text);font-family:'Inter',sans-serif;}
+.split-row.spike{color:var(--red);}
+.split-row.spike .mi{color:var(--red);}
+.run-detail-note{font-size:11px;color:var(--red);margin-top:8px;line-height:1.4;}
 
-  .trend-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;margin-bottom:16px;}
-  .trend-chips{display:flex;gap:10px;margin-bottom:16px;}
-  .trend-chip{flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;}
-  .trend-chip .label{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
-  .trend-chip .value{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;}
-  .trend-chip .value.good{color:var(--green);}
-  .trend-chip .value.bad{color:var(--red);}
-  .trend-list{margin-top:14px;}
-  .trend-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--text-muted);}
-  .trend-row:last-child{border-bottom:none;}
-  .trend-row .d{color:var(--text);}
-  .trend-note{font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.5;}
+.trend-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;margin-bottom:16px;}
+.trend-chips{display:flex;gap:10px;margin-bottom:16px;}
+.trend-chip{flex:1;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;}
+.trend-chip .label{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
+.trend-chip .value{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;}
+.trend-chip .value.good{color:var(--green);}
+.trend-chip .value.bad{color:var(--red);}
+.trend-list{margin-top:14px;}
+.trend-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--text-muted);}
+.trend-row:last-child{border-bottom:none;}
+.trend-row .d{color:var(--text);}
+.trend-note{font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.5;}
 
-  .plan-week{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden;}
-  .plan-week.current{border-color:var(--gold-dim);}
-  .plan-week-head{padding:13px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
-  .plan-week-head .wk-num{font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;}
-  .plan-week-head .wk-dates{font-size:11px;color:var(--text-muted);margin-top:2px;}
-  .plan-week-head .wk-mi{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);}
-  .plan-week-body{padding:0 14px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;display:none;}
-  .plan-week-body.open{display:block;}
-  .plan-week-body b{color:var(--text);}
-  .plan-actual{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
-  .pa-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:3px 0;gap:10px;}
-  .pa-row span:first-child{color:var(--text-muted);flex-shrink:0;}
-  .pa-row span:last-child{text-align:right;}
+.plan-week{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.plan-week.current{border-color:var(--gold-dim);}
+.plan-week-head{padding:13px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+.plan-week-head .wk-num{font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;}
+.plan-week-head .wk-dates{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.plan-week-head .wk-mi{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);}
+.plan-week-body{padding:0 14px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;display:none;}
+.plan-week-body.open{display:block;}
+.plan-week-body b{color:var(--text);}
+.plan-actual{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+.pa-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:3px 0;gap:10px;}
+.pa-row span:first-child{color:var(--text-muted);flex-shrink:0;}
+.pa-row span:last-child{text-align:right;}
 
-  .plan-chart-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 14px 10px;margin-bottom:14px;}
-  .plan-chart-legend{display:flex;gap:16px;font-size:11px;color:var(--text-muted);margin-bottom:10px;}
-  .plan-chart-legend .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle;}
-  .plan-chart-legend .sw.planned{background:var(--line);}
-  .plan-chart-legend .sw.actual{background:var(--gold);}
+.plan-chart-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 14px 10px;margin-bottom:14px;}
+.plan-chart-legend{display:flex;gap:16px;font-size:11px;color:var(--text-muted);margin-bottom:10px;}
+.plan-chart-legend .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+.plan-chart-legend .sw.planned{background:var(--line);}
+.plan-chart-legend .sw.actual{background:var(--gold);}
 
-  .race-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
-  .race-card.next{border-color:var(--gold-dim);background:linear-gradient(155deg, rgba(201,162,39,0.08), var(--surface));}
-  .race-card.done{opacity:0.55;}
-  .race-card .race-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
-  .race-card .race-name{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;}
-  .race-card .race-date{font-size:12px;color:var(--text-muted);margin-top:3px;}
-  .race-card .race-days{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--gold);text-align:right;white-space:nowrap;}
-  .race-card .race-days .unit{display:block;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:500;font-family:'Inter',sans-serif;}
-  .race-card .race-meta{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
-  .race-tag{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--line);}
-  .race-tag.next-tag{color:var(--gold);border-color:var(--gold-dim);}
-  .race-tag.done-tag{color:var(--green);border-color:#2f5f3f;}
+.race-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+.race-card.next{border-color:var(--gold-dim);background:linear-gradient(155deg, rgba(201,162,39,0.08), var(--surface));}
+.race-card.done{opacity:0.55;}
+.race-card .race-row1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.race-card .race-name{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:0.02em;}
+.race-card .race-date{font-size:12px;color:var(--text-muted);margin-top:3px;}
+.race-card .race-days{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--gold);text-align:right;white-space:nowrap;}
+.race-card .race-days .unit{display:block;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:500;font-family:'Inter',sans-serif;}
+.race-card .race-meta{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.race-tag{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--line);}
+.race-tag.next-tag{color:var(--gold);border-color:var(--gold-dim);}
+.race-tag.done-tag{color:var(--green);border-color:#2f5f3f;}
 
-  nav.tabbar{position:fixed;bottom:0;left:0;right:0;background:rgba(18,21,26,0.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:10;}
-  nav.tabbar button{flex:1;background:none;border:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;padding:8px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
-  nav.tabbar button svg{width:20px;height:20px;stroke:var(--text-muted);}
-  nav.tabbar button.active{color:var(--gold);}
-  nav.tabbar button.active svg{stroke:var(--gold);}
+nav.tabbar{position:fixed;bottom:0;left:0;right:0;background:rgba(18,21,26,0.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:10;}
+nav.tabbar button{flex:1;background:none;border:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;padding:8px 2px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+nav.tabbar button svg{width:20px;height:20px;stroke:var(--text-muted);}
+nav.tabbar button.active{color:var(--gold);}
+nav.tabbar button.active svg{stroke:var(--gold);}
 
-  .goal-note{font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.5;padding:0 2px;}
-  .loading-state{text-align:center;padding:30px;color:var(--text-muted);font-size:13px;}
+.goal-note{font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.5;padding:0 2px;}
+.loading-state{text-align:center;padding:30px;color:var(--text-muted);font-size:13px;}
 </style>
 </head>
 <body>
 
 <header class="top">
-  <div>
-    <div class="brand">Sub<span>3</span> · CIM</div>
-    <div class="sub">Dec 6, 2026 · Sacramento</div>
-  </div>
-  <button class="refresh-btn" id="refreshBtn">Refresh</button>
+<div>
+<div class="brand">Sub<span>3</span> · CIM</div>
+<div class="sub">Dec 6, 2026 · Sacramento</div>
+</div>
+<button class="refresh-btn" id="refreshBtn">Refresh</button>
 </header>
 
 <main>
 
-  <section class="view active" id="view-dashboard">
-    <div class="countdown-card">
-      <div class="eyebrow">Race Day Countdown</div>
-      <div class="countdown-big"><span id="daysLeft">--</span><span class="unit">days<br>to CIM</span></div>
-      <div class="countdown-meta"><b id="weeksLeft">--</b> weeks of training remaining · currently <b id="currentPhase">—</b></div>
-      <div class="streak-pill" id="streakPill" style="display:none;"></div>
-    </div>
+<section class="view active" id="view-dashboard">
+<div class="countdown-card">
+<div class="eyebrow">Race Day Countdown</div>
+<div class="countdown-big"><span id="daysLeft">--</span><span class="unit">days<br>to CIM</span></div>
+<div class="countdown-meta"><b id="weeksLeft">--</b> weeks of training remaining · currently <b id="currentPhase">—</b></div>
+<div class="streak-pill" id="streakPill" style="display:none;"></div>
+</div>
 
-    <div class="goal-row">
-      <div class="goal-chip accent"><div class="label">Goal Time</div><div class="value">2:55:00</div></div>
-      <div class="goal-chip accent"><div class="label">Goal Pace</div><div class="value">6:41/mi</div></div>
-      <div class="goal-chip"><div class="label">This Week</div><div class="value" id="weekMiles">0 mi</div></div>
-    </div>
+<div class="goal-row">
+<div class="goal-chip accent"><div class="label">Goal Time</div><div class="value">2:55:00</div></div>
+<div class="goal-chip accent"><div class="label">Goal Pace</div><div class="value">6:41/mi</div></div>
+<div class="goal-chip"><div class="label">This Week</div><div class="value" id="weekMiles">0 mi</div></div>
+</div>
 
-    <div class="status-card" id="statusCard" style="display:none;"></div>
+<div class="status-card" id="statusCard" style="display:none;"></div>
 
-    <div class="paceband-wrap">
-      <div class="paceband-title"><span>Goal Pace Band</span><span class="tag">6:41 / mi</span></div>
-      <div class="paceband" id="pacebandRow"></div>
-    </div>
+<div class="paceband-wrap">
+<div class="paceband-title"><span>Goal Pace Band</span><span class="tag">6:41 / mi</span></div>
+<div class="paceband" id="pacebandRow"></div>
+</div>
 
-    <div class="week-card" id="thisWeekCard"></div>
+<div class="week-card" id="thisWeekCard"></div>
 
-    <div class="goal-note">Runs sync automatically from Strava — this is a live view, no manual entry needed.</div>
-  </section>
+<div class="goal-note">Runs sync automatically from Strava — this is a live view, no manual entry needed.</div>
+</section>
 
-  <section class="view" id="view-history">
-    <div class="section-title">Run History</div>
-    <div id="historyList" class="loading-state">Loading runs…</div>
-  </section>
+<section class="view" id="view-history">
+<div class="section-title">Run History</div>
+<div id="historyList" class="loading-state">Loading runs…</div>
+</section>
 
-  <section class="view" id="view-trends">
-    <div class="section-title">Projected Marathon Time</div>
-    <div id="projTrendContent"></div>
+<section class="view" id="view-trends">
+<div class="section-title">Projected Marathon Time</div>
+<div id="projTrendContent"></div>
 
-    <div class="section-title">Long Run Heart Rate Trend</div>
-    <div id="trendsContent"></div>
-  </section>
+<div class="section-title">Long Run Heart Rate Trend</div>
+<div id="trendsContent"></div>
+</section>
 
-  <section class="view" id="view-plan">
-    <div class="section-title">16-Week Plan · Base → Peak → Taper</div>
-    <div class="plan-chart-wrap">
-      <div class="plan-chart-legend"><span><i class="sw planned"></i>Planned</span><span><i class="sw actual"></i>Actual</span></div>
-      <div id="planChart"></div>
-    </div>
-    <div id="planList"></div>
-    <div class="goal-note">This plan is built around a 6:41/mi goal pace (2:55:00) — a real BQ-cushion stretch target, revisited as your mid-block fitness data comes in.</div>
-  </section>
+<section class="view" id="view-plan">
+<div class="section-title">16-Week Plan · Base → Peak → Taper</div>
+<div class="plan-chart-wrap">
+<div class="plan-chart-legend"><span><i class="sw planned"></i>Planned</span><span><i class="sw actual"></i>Actual</span></div>
+<div id="planChart"></div>
+</div>
+<div id="planList"></div>
+<div class="goal-note">Goal pace stays 6:41/mi (2:55:00) for now. Quality-session targets below are set from your current fitness (VDOT 50, locked Sept 2026) rather than back-calculated from goal pace — they'll tighten toward 6:41 as fitness comes up through the block.</div>
+</section>
 
-  <section class="view" id="view-season">
-    <div class="section-title">2026–2027 Race Season</div>
-    <div id="seasonList"></div>
-    <div class="goal-note">Only CIM has a goal pace and training plan wired up so far — the rest are placeholders until each gets built out closer to race day.</div>
-  </section>
+<section class="view" id="view-season">
+<div class="section-title">2026–2027 Race Season</div>
+<div id="seasonList"></div>
+<div class="goal-note">Only CIM has a goal pace and training plan wired up so far — the rest are placeholders until each gets built out closer to race day.</div>
+</section>
 
 </main>
 
 <nav class="tabbar">
-  <button class="tab-btn active" data-view="dashboard">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2 4 4 8-8 4 4"/><path d="M3 20h18"/></svg>
-    Dashboard
-  </button>
-  <button class="tab-btn" data-view="history">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-    History
-  </button>
-  <button class="tab-btn" data-view="trends">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
-    Trends
-  </button>
-  <button class="tab-btn" data-view="plan">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
-    Plan
-  </button>
-  <button class="tab-btn" data-view="season">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V3"/><path d="M5 4h13l-2.5 4L18 12H5"/></svg>
-    Season
-  </button>
+<button class="tab-btn active" data-view="dashboard">
+<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2 4 4 8-8 4 4"/><path d="M3 20h18"/></svg>
+Dashboard
+</button>
+<button class="tab-btn" data-view="history">
+<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+History
+</button>
+<button class="tab-btn" data-view="trends">
+<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>
+Trends
+</button>
+<button class="tab-btn" data-view="plan">
+<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+Plan
+</button>
+<button class="tab-btn" data-view="season">
+<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V3"/><path d="M5 4h13l-2.5 4L18 12H5"/></svg>
+Season
+</button>
 </nav>
 
 <script>
@@ -307,56 +311,150 @@ const HR_SPIKE_BPM = 10;
 // used here to find hard-effort segments within a run's mile splits.
 const PACE_TEMPO_MAX = 410;
 
+/* ---------------- Manual run-type override ---------------- */
+// The 5 categories lib/strava.js already assigns automatically. No new
+// categories added — 'speed' already covers what we've been calling
+// "interval" in training-plan conversation, so we keep that name here to
+// stay consistent with the existing sync logic and CSS.
+const RUN_TYPES = ['easy','tempo','long','speed','race'];
+
+async function setRunType(runId, newType){
+const { error } = await db.from('runs').update({ type: newType }).eq('id', runId);
+if(error){
+console.error('Failed to update run type:', error.message);
+alert('Could not save — check that the runs table allows updates from this key (RLS policy).');
+return false;
+}
+const r = RUNS.find(x=>x.id==runId);
+if(r) r.type = newType;
+return true;
+}
+function closeTypePicker(){
+document.querySelectorAll('.type-picker').forEach(el=>el.remove());
+document.removeEventListener('click', closeTypePickerOnOutsideClick);
+}
+function closeTypePickerOnOutsideClick(e){
+if(!e.target.closest('.type-picker') && !e.target.closest('.type-badge')) closeTypePicker();
+}
+function openTypePicker(evt, runId){
+evt.stopPropagation();
+closeTypePicker();
+const badge = evt.currentTarget;
+const picker = document.createElement('div');
+picker.className = 'type-picker';
+picker.innerHTML = RUN_TYPES.map(t=>`<span class="type-badge type-${t}" onclick="event.stopPropagation();pickRunType('${runId}','${t}')">${TYPE_LABEL[t]}</span>`).join('');
+document.body.appendChild(picker);
+const rect = badge.getBoundingClientRect();
+picker.style.top = `${rect.bottom + window.scrollY + 4}px`;
+picker.style.left = `${rect.left + window.scrollX}px`;
+setTimeout(()=>document.addEventListener('click', closeTypePickerOnOutsideClick), 0);
+}
+async function pickRunType(runId, newType){
+closeTypePicker();
+const ok = await setRunType(runId, newType);
+if(ok){ renderHistory(); renderDashboard(); renderPlan(); }
+}
+
 /* ---------------- Training Plan ---------------- */
+// Weeks 1-4 are already completed and left untouched. Weeks 5-16 carry
+// two structured "key sessions" (Tuesday tempo, Friday speed/VO2max)
+// instead of one freeform work note — paces come from the VDOT 50 base
+// locked in Sept 2026, independent of the 6:41/mi goal pace above (see
+// the Plan tab's goal-note for why they're tracked separately).
 const PLAN = [
-  {n:1,  start:'2026-08-17', phase:'Base',  miles:38, long:10, work:'Rebuilding consistency after a light week. Easy running, no more sub-15mi weeks from here.'},
-  {n:2,  start:'2026-08-24', phase:'Base',  miles:42, long:12, work:'Strides 6x20s after an easy run. Long run fully easy.'},
-  {n:3,  start:'2026-08-31', phase:'Base',  miles:46, long:13, work:'First marathon-pace work: 3mi @ 6:41 within the long run.'},
-  {n:4,  start:'2026-09-07', phase:'Cutback', miles:34, long:10, work:'Recovery week — easy running only, let the legs absorb the base.'},
-  {n:5,  start:'2026-09-14', phase:'Build', miles:50, long:15, work:'Long run: 4mi @ 6:41 (MP). Midweek tempo 5mi @ 6:30-6:40.'},
-  {n:6,  start:'2026-09-21', phase:'Build', miles:54, long:16, work:'Long run: 5mi @ MP. Intervals 6x800m @ 6:00-6:10.'},
-  {n:7,  start:'2026-09-28', phase:'Build', miles:57, long:17, work:'Long run: 6mi @ MP. Tempo 5mi @ 6:25-6:35 — a touch faster than weeks 5-6.'},
-  {n:8,  start:'2026-10-05', phase:'Cutback', miles:42, long:12, work:'Recovery week — easy running, short strides only.'},
-  {n:9,  start:'2026-10-12', phase:'Peak',  miles:58, long:18, work:'Long run: 7mi @ MP. Midweek tempo 5mi @ 6:20-6:30 — threshold should be moving now.'},
-  {n:10, start:'2026-10-19', phase:'Peak',  miles:60, long:19, work:'Long run: 9mi @ MP. Intervals 6x800m @ 5:55-6:05 mid-week.'},
-  {n:11, start:'2026-10-26', phase:'Peak',  miles:62, long:20, work:'The 20-miler — 10mi @ MP. Your key confidence run.'},
-  {n:12, start:'2026-11-02', phase:'Cutback', miles:44, long:13, work:'Recovery week after the 20-miler. Easy running, stay loose.'},
-  {n:13, start:'2026-11-09', phase:'Peak',  miles:58, long:17, work:'Biggest specific session: 11mi @ MP within the long run.'},
-  {n:14, start:'2026-11-16', phase:'Taper', miles:42, long:12, work:'Volume drops, intensity stays sharp. Tempo 4mi @ MP-10s.'},
-  {n:15, start:'2026-11-23', phase:'Taper', miles:32, long:8,  work:'Short & easy with a few MP miles to stay sharp. Rest fully 2 days before next week.'},
-  {n:16, start:'2026-11-30', phase:'Race',  miles:32, long:0,  work:'Shakeouts of 2-3mi Tue/Thu/Fri. Race day Sunday Dec 6 — go get your 2:55.'},
+{n:1, start:'2026-08-17', phase:'Base', miles:38, long:10, work:'Rebuilding consistency after a light week. Easy running, no more sub-15mi weeks from here.'},
+{n:2, start:'2026-08-24', phase:'Base', miles:42, long:12, work:'Strides 6x20s after an easy run. Long run fully easy.'},
+{n:3, start:'2026-08-31', phase:'Base', miles:46, long:13, work:'First marathon-pace work: 3mi @ 6:41 within the long run.'},
+{n:4, start:'2026-09-07', phase:'Cutback', miles:34, long:10, work:'Recovery week — easy running only, let the legs absorb the base.'},
+{n:5, start:'2026-09-14', phase:'Build', miles:50, long:15, sessions:[
+{day:'Tue', type:'tempo', desc:'3x2mi @ 7:05-7:10/mi, 3min jog'},
+{day:'Fri', type:'speed', desc:'6x800m @ 6:15-6:20/mi, 400m jog'}]},
+{n:6, start:'2026-09-21', phase:'Build', miles:54, long:16, sessions:[
+{day:'Tue', type:'tempo', desc:'4mi continuous @ 7:05/mi'},
+{day:'Fri', type:'speed', desc:'5x1000m @ 6:15/mi'}]},
+{n:7, start:'2026-09-28', phase:'Build', miles:57, long:17, sessions:[
+{day:'Tue', type:'tempo', desc:'5mi continuous @ 7:00-7:05/mi'},
+{day:'Fri', type:'speed', desc:'4x1200m @ 6:15/mi'}]},
+{n:8, start:'2026-10-05', phase:'Cutback', miles:42, long:12, sessions:[
+{day:'Tue', type:'tempo', desc:'3x2mi @ 6:55-7:00/mi'},
+{day:'Fri', type:'speed', desc:'8x800m @ 6:15/mi'}]},
+{n:9, start:'2026-10-12', phase:'Peak', miles:58, long:18, sessions:[
+{day:'Tue', type:'tempo', desc:'6mi progression, easy to 7:00 last 4mi'},
+{day:'Fri', type:'speed', desc:'5x1000m @ 6:10/mi'}]},
+{n:10, start:'2026-10-19', phase:'Peak', miles:60, long:19, sessions:[
+{day:'Tue', type:'tempo', desc:'2x3mi @ 7:00/mi'},
+{day:'Fri', type:'speed', desc:'3x1600m @ 6:15/mi'}]},
+{n:11, start:'2026-10-26', phase:'Peak', miles:62, long:20, sessions:[
+{day:'Tue', type:'tempo', desc:'8mi w/ 5mi @ 7:16/mi (MP)'},
+{day:'Fri', type:'speed', desc:'6x800m @ 6:15/mi'}]},
+{n:12, start:'2026-11-02', phase:'Cutback', miles:44, long:13, sessions:[
+{day:'Tue', type:'tempo', desc:'10mi w/ 6mi @ 7:16/mi (MP)'},
+{day:'Fri', type:'speed', desc:'4x1000m @ 6:10/mi'}]},
+{n:13, start:'2026-11-09', phase:'Peak', miles:58, long:17, sessions:[
+{day:'Tue', type:'tempo', desc:'4mi @ 6:50-6:55/mi'},
+{day:'Fri', type:'speed', desc:'5x800m @ 6:05-6:10/mi'}]},
+{n:14, start:'2026-11-16', phase:'Taper', miles:42, long:12, sessions:[
+{day:'Tue', type:'tempo', desc:'3x1.5mi @ 6:50/mi'},
+{day:'Fri', type:'speed', desc:'6x400m + 4x200m (fast)'}]},
+{n:15, start:'2026-11-23', phase:'Taper', miles:32, long:8, sessions:[
+{day:'Tue', type:'tempo', desc:'3mi @ 6:55/mi'},
+{day:'Fri', type:'speed', desc:'4x400m strides, easy'}]},
+{n:16, start:'2026-11-30', phase:'Race', miles:32, long:0, work:'Shakeouts of 2-3mi Tue/Thu/Fri. Race day Sunday Dec 6 — go get your 2:55.'},
 ];
 
 function addDays(d, n){ const r = new Date(d); r.setDate(r.getDate()+n); return r; }
 function fmtDate(d){ return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
 function weekRange(startStr){
-  const s = new Date(startStr+'T00:00:00');
-  const e = addDays(s,6);
-  return `${fmtDate(s)} – ${fmtDate(e)}`;
+const s = new Date(startStr+'T00:00:00');
+const e = addDays(s,6);
+return `${fmtDate(s)} – ${fmtDate(e)}`;
 }
 function getWeekForDate(dateObj){
-  for(let i=PLAN.length-1;i>=0;i--){
-    const s = new Date(PLAN[i].start+'T00:00:00');
-    if(dateObj >= s) return PLAN[i];
-  }
-  return PLAN[0];
+for(let i=PLAN.length-1;i>=0;i--){
+const s = new Date(PLAN[i].start+'T00:00:00');
+if(dateObj >= s) return PLAN[i];
+}
+return PLAN[0];
 }
 function currentWeek(){ return getWeekForDate(new Date()); }
 
 // Compares a plan week's prescription against what was actually logged:
-// total miles, the longest 'long' run that week, and whether a
-// tempo/speed session was completed.
+// total miles, the longest 'long' run that week, and — for weeks with
+// structured `sessions` — the best-matching actual run for each planned
+// session (by type; whichever matching run in the week is closest to the
+// session's own day-of-week, so a Tuesday tempo doesn't grab a Thursday one
+// if both exist).
 function getWeekActuals(wk){
-  const weekStart = new Date(wk.start+'T00:00:00');
-  const weekEnd = addDays(weekStart, 6);
-  const weekRuns = RUNS.filter(r=>{
-    const d = new Date(r.date+'T00:00:00');
-    return d>=weekStart && d<=weekEnd;
-  });
-  const totalMi = weekRuns.reduce((a,r)=>a+r.distance,0);
-  const longRun = weekRuns.filter(r=>r.type==='long').sort((a,b)=>b.distance-a.distance)[0] || null;
-  const keySession = weekRuns.find(r=> r.type==='tempo' || r.type==='speed') || null;
-  return { totalMi, longRun, keySession };
+const weekStart = new Date(wk.start+'T00:00:00');
+const weekEnd = addDays(weekStart, 6);
+const weekRuns = RUNS.filter(r=>{
+const d = new Date(r.date+'T00:00:00');
+return d>=weekStart && d<=weekEnd;
+});
+const totalMi = weekRuns.reduce((a,r)=>a+r.distance,0);
+const longRun = weekRuns.filter(r=>r.type==='long').sort((a,b)=>b.distance-a.distance)[0] || null;
+
+let sessionMatches = null;
+if(wk.sessions){
+const DAY_INDEX = {Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+sessionMatches = wk.sessions.map(s=>{
+const candidates = weekRuns.filter(r=>r.type===s.type);
+if(candidates.length===0) return {planned:s, run:null};
+const targetIdx = DAY_INDEX[s.day];
+const withDelta = candidates.map(r=>{
+const rDate = new Date(r.date+'T00:00:00');
+const delta = Math.abs(rDate.getDay() - targetIdx);
+return {r, delta};
+}).sort((a,b)=>a.delta-b.delta);
+return {planned:s, run:withDelta[0].r};
+});
+}
+
+// Kept for backward compat with weeks that still use the old single
+// freeform `work` field (weeks 1-4, 16) instead of `sessions`.
+const keySession = weekRuns.find(r=> r.type==='tempo' || r.type==='speed') || null;
+
+return { totalMi, longRun, keySession, sessionMatches };
 }
 
 // Looks at the last few *completed* plan weeks (week already ended) and
@@ -368,73 +466,73 @@ function getWeekActuals(wk){
 // visible per-run in History and as a trend in Trends — it's just not
 // used to drive this on-track/behind label.
 function computeOnTrackStatus(){
-  const now = new Date();
-  const completed = PLAN.filter(wk=>{
-    const weekEnd = addDays(new Date(wk.start+'T00:00:00'), 6);
-    return weekEnd < now;
-  }).slice(-3);
+const now = new Date();
+const completed = PLAN.filter(wk=>{
+const weekEnd = addDays(new Date(wk.start+'T00:00:00'), 6);
+return weekEnd < now;
+}).slice(-3);
 
-  if(completed.length===0) return null;
+if(completed.length===0) return null;
 
-  let plannedMi = 0, actualMi = 0;
-  completed.forEach(wk=>{
-    const actual = getWeekActuals(wk);
-    plannedMi += wk.miles;
-    actualMi += actual.totalMi;
-  });
+let plannedMi = 0, actualMi = 0;
+completed.forEach(wk=>{
+const actual = getWeekActuals(wk);
+plannedMi += wk.miles;
+actualMi += actual.totalMi;
+});
 
-  const adherencePct = plannedMi>0 ? (actualMi/plannedMi)*100 : 0;
-  const wkWord = completed.length>1 ? 'weeks' : 'week';
+const adherencePct = plannedMi>0 ? (actualMi/plannedMi)*100 : 0;
+const wkWord = completed.length>1 ? 'weeks' : 'week';
 
-  let status;
-  if(adherencePct < 80){
-    status = 'behind';
-  } else if(adherencePct >= 95){
-    status = 'ahead';
-  } else {
-    status = 'on-track';
-  }
+let status;
+if(adherencePct < 80){
+status = 'behind';
+} else if(adherencePct >= 95){
+status = 'ahead';
+} else {
+status = 'on-track';
+}
 
-  return {
-    status,
-    message: `${adherencePct.toFixed(0)}% of planned mileage over the last ${completed.length} ${wkWord}.`,
-  };
+return {
+status,
+message: `${adherencePct.toFixed(0)}% of planned mileage over the last ${completed.length} ${wkWord}.`,
+};
 }
 
 // Counts consecutive completed weeks, most recent first, where actual
 // mileage hit at least 90% of that week's planned target. Breaks on the
 // first miss, so it's the current unbroken streak, not a lifetime best.
 function computeAdherenceStreak(){
-  const now = new Date();
-  const completed = PLAN.filter(wk=>{
-    const weekEnd = addDays(new Date(wk.start+'T00:00:00'), 6);
-    return weekEnd < now;
-  });
-  let streak = 0;
-  for(let i=completed.length-1;i>=0;i--){
-    const actual = getWeekActuals(completed[i]);
-    if(actual.totalMi >= completed[i].miles*0.9){
-      streak++;
-    } else {
-      break;
-    }
-  }
-  return streak;
+const now = new Date();
+const completed = PLAN.filter(wk=>{
+const weekEnd = addDays(new Date(wk.start+'T00:00:00'), 6);
+return weekEnd < now;
+});
+let streak = 0;
+for(let i=completed.length-1;i>=0;i--){
+const actual = getWeekActuals(completed[i]);
+if(actual.totalMi >= completed[i].miles*0.9){
+streak++;
+} else {
+break;
+}
+}
+return streak;
 }
 
 function secToPace(sec){
-  if(!isFinite(sec) || sec<=0) return '—:—';
-  const m = Math.floor(sec/60);
-  const s = Math.round(sec%60);
-  return `${m}:${s.toString().padStart(2,'0')}`;
+if(!isFinite(sec) || sec<=0) return '—:—';
+const m = Math.floor(sec/60);
+const s = Math.round(sec%60);
+return `${m}:${s.toString().padStart(2,'0')}`;
 }
 function secToClock(sec){
-  sec = Math.round(sec);
-  const h = Math.floor(sec/3600);
-  const m = Math.floor((sec%3600)/60);
-  const s = sec%60;
-  if(h>0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-  return `${m}:${s.toString().padStart(2,'0')}`;
+sec = Math.round(sec);
+const h = Math.floor(sec/3600);
+const m = Math.floor((sec%3600)/60);
+const s = sec%60;
+if(h>0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+return `${m}:${s.toString().padStart(2,'0')}`;
 }
 
 /* ---------------- Season ---------------- */
@@ -443,159 +541,173 @@ function secToClock(sec){
 // deliberately just placeholders until each gets built out closer to its
 // own race day.
 const RACES = [
-  { name:'California International Marathon', date:'2026-12-06', location:'Sacramento, CA', distanceLabel:'Marathon · 26.2mi', goalTime: GOAL_SECONDS },
-  { name:'Ventura Marathon', date:'2027-02-21', location:'Ventura, CA', distanceLabel:'Marathon · 26.2mi', goalTime: null },
-  { name:'Way Too Cool 50K', date:'2027-03-06', location:'Cool, CA', distanceLabel:'Trail Ultra · 50k (~31.1mi)', goalTime: null },
-  { name:'San Diego Marathon', date:'2027-06-06', location:'San Diego, CA', distanceLabel:'Marathon · 26.2mi', goalTime: null },
+{ name:'California International Marathon', date:'2026-12-06', location:'Sacramento, CA', distanceLabel:'Marathon · 26.2mi', goalTime: GOAL_SECONDS },
+{ name:'Ventura Marathon', date:'2027-02-21', location:'Ventura, CA', distanceLabel:'Marathon · 26.2mi', goalTime: null },
+{ name:'Way Too Cool 50K', date:'2027-03-06', location:'Cool, CA', distanceLabel:'Trail Ultra · 50k (~31.1mi)', goalTime: null },
+{ name:'San Diego Marathon', date:'2027-06-06', location:'San Diego, CA', distanceLabel:'Marathon · 26.2mi', goalTime: null },
 ];
 
 function renderSeason(){
-  const el = document.getElementById('seasonList');
-  if(!el) return;
-  const now = new Date();
-  const sorted = RACES.slice().sort((a,b)=> new Date(a.date) - new Date(b.date));
-  const nextRace = sorted.find(r => new Date(r.date+'T00:00:00') >= now);
+const el = document.getElementById('seasonList');
+if(!el) return;
+const now = new Date();
+const sorted = RACES.slice().sort((a,b)=> new Date(a.date) - new Date(b.date));
+const nextRace = sorted.find(r => new Date(r.date+'T00:00:00') >= now);
 
-  el.innerHTML = sorted.map(r=>{
-    const raceDate = new Date(r.date+'T00:00:00');
-    const isDone = raceDate < now;
-    const isNext = !!nextRace && r.date === nextRace.date;
-    const daysOut = Math.ceil((raceDate - now) / (1000*60*60*24));
+el.innerHTML = sorted.map(r=>{
+const raceDate = new Date(r.date+'T00:00:00');
+const isDone = raceDate < now;
+const isNext = !!nextRace && r.date === nextRace.date;
+const daysOut = Math.ceil((raceDate - now) / (1000*60*60*24));
 
-    const daysHtml = isDone
-      ? `<div class="race-days" style="color:var(--green);">✓<span class="unit">Done</span></div>`
-      : `<div class="race-days">${daysOut}<span class="unit">days</span></div>`;
+const daysHtml = isDone
+? `<div class="race-days" style="color:var(--green);">✓<span class="unit">Done</span></div>`
+: `<div class="race-days">${daysOut}<span class="unit">days</span></div>`;
 
-    const dateStr = raceDate.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-    const goalHtml = r.goalTime
-      ? `<span class="race-tag next-tag">Goal ${secToClock(r.goalTime)}</span>`
-      : `<span class="race-tag">Goal TBD</span>`;
+const dateStr = raceDate.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+const goalHtml = r.goalTime
+? `<span class="race-tag next-tag">Goal ${secToClock(r.goalTime)}</span>`
+: `<span class="race-tag">Goal TBD</span>`;
 
-    return `
-      <div class="race-card ${isNext?'next':''} ${isDone?'done':''}">
-        <div class="race-row1">
-          <div>
-            <div class="race-name">${r.name}</div>
-            <div class="race-date">${dateStr} · ${r.location}</div>
-          </div>
-          ${daysHtml}
-        </div>
-        <div class="race-meta">
-          <span class="race-tag">${r.distanceLabel}</span>
-          ${goalHtml}
-          ${isNext ? `<span class="race-tag next-tag">Next Up</span>` : ''}
-          ${isDone ? `<span class="race-tag done-tag">Completed</span>` : ''}
-        </div>
-      </div>`;
-  }).join('');
+return `
+<div class="race-card ${isNext?'next':''} ${isDone?'done':''}">
+<div class="race-row1">
+<div>
+<div class="race-name">${r.name}</div>
+<div class="race-date">${dateStr} · ${r.location}</div>
+</div>
+${daysHtml}
+</div>
+<div class="race-meta">
+<span class="race-tag">${r.distanceLabel}</span>
+${goalHtml}
+${isNext ? `<span class="race-tag next-tag">Next Up</span>` : ''}
+${isDone ? `<span class="race-tag done-tag">Completed</span>` : ''}
+</div>
+</div>`;
+}).join('');
 }
 
 /* ---------------- Data ---------------- */
 let RUNS = [];
 async function loadRuns(){
-  const { data, error } = await db
-    .from('runs')
-    .select('*')
-    .order('date', { ascending: false });
+const { data, error } = await db
+.from('runs')
+.select('*')
+.order('date', { ascending: false });
 
-  if(error){
-    console.error('Failed to load runs:', error.message);
-    RUNS = [];
-    return;
-  }
-  RUNS = (data || []).map(r => ({
-    id: r.id,
-    date: r.date,
-    type: r.type,
-    distance: Number(r.distance),
-    time: r.time,
-    notes: r.notes,
-    source: r.source,
-    avgHeartrate: r.avg_heartrate || null,
-    splits: Array.isArray(r.splits) ? r.splits : null,
-  }));
+if(error){
+console.error('Failed to load runs:', error.message);
+RUNS = [];
+return;
+}
+RUNS = (data || []).map(r => ({
+id: r.id,
+date: r.date,
+type: r.type,
+distance: Number(r.distance),
+time: r.time,
+notes: r.notes,
+source: r.source,
+avgHeartrate: r.avg_heartrate || null,
+splits: Array.isArray(r.splits) ? r.splits : null,
+}));
 }
 
 /* ---------------- Rendering ---------------- */
 function renderDashboard(){
-  const now = new Date();
-  const msLeft = RACE_DATE - now;
-  const daysLeft = Math.max(0, Math.ceil(msLeft/(1000*60*60*24)));
-  const weeksLeft = Math.max(0, Math.ceil(daysLeft/7));
-  document.getElementById('daysLeft').textContent = daysLeft;
-  document.getElementById('weeksLeft').textContent = weeksLeft;
+const now = new Date();
+const msLeft = RACE_DATE - now;
+const daysLeft = Math.max(0, Math.ceil(msLeft/(1000*60*60*24)));
+const weeksLeft = Math.max(0, Math.ceil(daysLeft/7));
+document.getElementById('daysLeft').textContent = daysLeft;
+document.getElementById('weeksLeft').textContent = weeksLeft;
 
-  const wk = currentWeek();
-  document.getElementById('currentPhase').textContent = wk.phase + ' phase';
+const wk = currentWeek();
+document.getElementById('currentPhase').textContent = wk.phase + ' phase';
 
-  renderStatusCard();
-  renderStreak();
+renderStatusCard();
+renderStreak();
 
-  const markers = [5,10,13.1,15,20,25,26.2];
-  const row = document.getElementById('pacebandRow');
-  row.innerHTML = markers.map(mi=>{
-    const t = secToClock(mi*GOAL_PACE_SEC_PER_MI);
-    return `<div class="mark"><div class="mi">${mi}mi</div><div class="t">${t}</div></div>`;
-  }).join('');
+const markers = [5,10,13.1,15,20,25,26.2];
+const row = document.getElementById('pacebandRow');
+row.innerHTML = markers.map(mi=>{
+const t = secToClock(mi*GOAL_PACE_SEC_PER_MI);
+return `<div class="mark"><div class="mi">${mi}mi</div><div class="t">${t}</div></div>`;
+}).join('');
 
-  const weekStart = new Date(wk.start+'T00:00:00');
-  const weekEnd = addDays(weekStart,6);
-  const thisWeekRuns = RUNS.filter(r=>{
-    const d = new Date(r.date+'T00:00:00');
-    return d>=weekStart && d<=weekEnd;
-  });
-  const totalMi = thisWeekRuns.reduce((a,r)=>a+r.distance,0);
-  document.getElementById('weekMiles').textContent = `${totalMi.toFixed(1)} mi`;
+const weekStart = new Date(wk.start+'T00:00:00');
+const weekEnd = addDays(weekStart,6);
+const thisWeekRuns = RUNS.filter(r=>{
+const d = new Date(r.date+'T00:00:00');
+return d>=weekStart && d<=weekEnd;
+});
+const totalMi = thisWeekRuns.reduce((a,r)=>a+r.distance,0);
+document.getElementById('weekMiles').textContent = `${totalMi.toFixed(1)} mi`;
 
-  const pct = Math.min(100, (totalMi/wk.miles)*100);
-  const over = totalMi >= wk.miles;
-  const progressText = over
-    ? `🎉 Goal hit for the week`
-    : `${(wk.miles-totalMi).toFixed(1)} mi to go`;
-  const actual = getWeekActuals(wk);
-  const longActualText = actual.longRun
-    ? ` — <span style="color:var(--green);">ran ${actual.longRun.distance.toFixed(1)}mi @ ${secToPace(actual.longRun.time/actual.longRun.distance)}/mi</span>`
-    : (wk.long>0 ? ` — <span style="color:var(--text-muted);">not yet logged</span>` : '');
-  const keyActualText = actual.keySession
-    ? `<span style="color:var(--green);">✓ ${TYPE_LABEL[actual.keySession.type]} ${actual.keySession.distance.toFixed(1)}mi @ ${secToPace(actual.keySession.time/actual.keySession.distance)}/mi</span>`
-    : `<span style="color:var(--text-muted);">not yet logged this week</span>`;
-  document.getElementById('thisWeekCard').innerHTML = `
-    <div class="row1">
-      <span class="phase-tag">Week ${wk.n} · ${wk.phase}</span>
-      <span class="mi-label">${weekRange(wk.start)}</span>
-    </div>
-    <div class="stat-line"><span>${totalMi.toFixed(1)} mi logged</span><span>${wk.miles} mi target</span></div>
-    <div class="bar-track"><div class="bar-fill ${over?'over':''}" style="width:${pct}%"></div></div>
-    <div class="progress-note ${over?'hit':''}">${progressText}</div>
-    <div class="workouts"><b>Long run:</b> ${wk.long>0? wk.long+' mi' : 'race week — see notes'}${longActualText}<br><b>Key session:</b> ${wk.work}<br>${keyActualText}</div>
-  `;
+const pct = Math.min(100, (totalMi/wk.miles)*100);
+const over = totalMi >= wk.miles;
+const progressText = over
+? `🎉 Goal hit for the week`
+: `${(wk.miles-totalMi).toFixed(1)} mi to go`;
+const actual = getWeekActuals(wk);
+const longActualText = actual.longRun
+? ` — <span style="color:var(--green);">ran ${actual.longRun.distance.toFixed(1)}mi @ ${secToPace(actual.longRun.time/actual.longRun.distance)}/mi</span>`
+: (wk.long>0 ? ` — <span style="color:var(--text-muted);">not yet logged</span>` : '');
+
+let keySessionsHtml;
+if(actual.sessionMatches){
+keySessionsHtml = actual.sessionMatches.map(m=>{
+const label = `${m.planned.day} ${TYPE_LABEL[m.planned.type]}`;
+const result = m.run
+? `<span style="color:var(--green);">✓ ${m.run.distance.toFixed(1)}mi @ ${secToPace(m.run.time/m.run.distance)}/mi</span>`
+: `<span style="color:var(--text-muted);">not yet logged</span>`;
+return `<div><b>${label}:</b> ${m.planned.desc}<br>${result}</div>`;
+}).join('');
+} else {
+const keyActualText = actual.keySession
+? `<span style="color:var(--green);">✓ ${TYPE_LABEL[actual.keySession.type]} ${actual.keySession.distance.toFixed(1)}mi @ ${secToPace(actual.keySession.time/actual.keySession.distance)}/mi</span>`
+: `<span style="color:var(--text-muted);">not yet logged this week</span>`;
+keySessionsHtml = `<b>Key session:</b> ${wk.work}<br>${keyActualText}`;
+}
+
+document.getElementById('thisWeekCard').innerHTML = `
+<div class="row1">
+<span class="phase-tag">Week ${wk.n} · ${wk.phase}</span>
+<span class="mi-label">${weekRange(wk.start)}</span>
+</div>
+<div class="stat-line"><span>${totalMi.toFixed(1)} mi logged</span><span>${wk.miles} mi target</span></div>
+<div class="bar-track"><div class="bar-fill ${over?'over':''}" style="width:${pct}%"></div></div>
+<div class="progress-note ${over?'hit':''}">${progressText}</div>
+<div class="workouts"><b>Long run:</b> ${wk.long>0? wk.long+' mi' : 'race week — see notes'}${longActualText}<br>${keySessionsHtml}</div>
+`;
 }
 
 function renderStreak(){
-  const pill = document.getElementById('streakPill');
-  const streak = computeAdherenceStreak();
-  if(streak < 2){
-    pill.style.display = 'none';
-    return;
-  }
-  pill.style.display = 'inline-flex';
-  pill.textContent = `🔥 ${streak}-week streak`;
+const pill = document.getElementById('streakPill');
+const streak = computeAdherenceStreak();
+if(streak < 2){
+pill.style.display = 'none';
+return;
+}
+pill.style.display = 'inline-flex';
+pill.textContent = `🔥 ${streak}-week streak`;
 }
 
 function renderStatusCard(){
-  const card = document.getElementById('statusCard');
-  const s = computeOnTrackStatus();
-  if(!s){
-    card.style.display = 'none';
-    return;
-  }
-  const labelMap = {ahead:'Ahead of Pace', 'on-track':'On Track', behind:'Behind Pace'};
-  card.style.display = 'block';
-  card.className = `status-card status-${s.status}`;
-  card.innerHTML = `
-    <div class="status-label">${labelMap[s.status]}</div>
-    <div class="status-msg">${s.message}</div>
-  `;
+const card = document.getElementById('statusCard');
+const s = computeOnTrackStatus();
+if(!s){
+card.style.display = 'none';
+return;
+}
+const labelMap = {ahead:'Ahead of Pace', 'on-track':'On Track', behind:'Behind Pace'};
+card.style.display = 'block';
+card.className = `status-card status-${s.status}`;
+card.innerHTML = `
+<div class="status-label">${labelMap[s.status]}</div>
+<div class="status-msg">${s.message}</div>
+`;
 }
 
 // Grouped bar chart of planned vs. actual mileage across all 16 weeks, so
@@ -603,98 +715,115 @@ function renderStatusCard(){
 // visible at a glance instead of only in the 3-week rolling status card or
 // one expanded week at a time below.
 function renderPlanChart(){
-  const el = document.getElementById('planChart');
-  if(!el) return;
-  const now = new Date();
-  const w = 600, h = 150, padX = 6, padTop = 8, padBottom = 16;
-  const n = PLAN.length;
-  const actuals = PLAN.map(wk=>getWeekActuals(wk).totalMi);
-  const maxMi = Math.max(...PLAN.map(wk=>wk.miles), ...actuals) * 1.08;
-  const groupW = (w - padX*2)/n;
-  const barW = groupW*0.34;
-  const gap = groupW*0.08;
-  const chartH = h - padTop - padBottom;
+const el = document.getElementById('planChart');
+if(!el) return;
+const now = new Date();
+const w = 600, h = 150, padX = 6, padTop = 8, padBottom = 16;
+const n = PLAN.length;
+const actuals = PLAN.map(wk=>getWeekActuals(wk).totalMi);
+const maxMi = Math.max(...PLAN.map(wk=>wk.miles), ...actuals) * 1.08;
+const groupW = (w - padX*2)/n;
+const barW = groupW*0.34;
+const gap = groupW*0.08;
+const chartH = h - padTop - padBottom;
 
-  let bars = '';
-  PLAN.forEach((wk,i)=>{
-    const started = new Date(wk.start+'T00:00:00') <= now;
-    const gx = padX + i*groupW;
+let bars = '';
+PLAN.forEach((wk,i)=>{
+const started = new Date(wk.start+'T00:00:00') <= now;
+const gx = padX + i*groupW;
 
-    const plannedH = (wk.miles/maxMi)*chartH;
-    bars += `<rect x="${(gx+gap).toFixed(1)}" y="${(h-padBottom-plannedH).toFixed(1)}" width="${barW.toFixed(1)}" height="${plannedH.toFixed(1)}" fill="var(--line)" rx="2"/>`;
+const plannedH = (wk.miles/maxMi)*chartH;
+bars += `<rect x="${(gx+gap).toFixed(1)}" y="${(h-padBottom-plannedH).toFixed(1)}" width="${barW.toFixed(1)}" height="${plannedH.toFixed(1)}" fill="var(--line)" rx="2"/>`;
 
-    if(started){
-      const actualMi = actuals[i];
-      const actualH = (actualMi/maxMi)*chartH;
-      const color = actualMi >= wk.miles ? 'var(--green)' : (actualMi >= wk.miles*0.7 ? 'var(--gold)' : 'var(--red)');
-      bars += `<rect x="${(gx+gap+barW+2).toFixed(1)}" y="${(h-padBottom-actualH).toFixed(1)}" width="${barW.toFixed(1)}" height="${actualH.toFixed(1)}" fill="${color}" rx="2"/>`;
-    }
+if(started){
+const actualMi = actuals[i];
+const actualH = (actualMi/maxMi)*chartH;
+const color = actualMi >= wk.miles ? 'var(--green)' : (actualMi >= wk.miles*0.7 ? 'var(--gold)' : 'var(--red)');
+bars += `<rect x="${(gx+gap+barW+2).toFixed(1)}" y="${(h-padBottom-actualH).toFixed(1)}" width="${barW.toFixed(1)}" height="${actualH.toFixed(1)}" fill="${color}" rx="2"/>`;
+}
 
-    bars += `<text x="${(gx+groupW/2).toFixed(1)}" y="${h-4}" font-size="8" fill="var(--text-muted)" text-anchor="middle">${wk.n}</text>`;
-  });
+bars += `<text x="${(gx+groupW/2).toFixed(1)}" y="${h-4}" font-size="8" fill="var(--text-muted)" text-anchor="middle">${wk.n}</text>`;
+});
 
-  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;">${bars}</svg>`;
+el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;">${bars}</svg>`;
 }
 
 function renderPlan(){
-  renderPlanChart();
-  const wkNow = currentWeek();
-  const list = document.getElementById('planList');
-  // Re-rendering rebuilds every week row's HTML (needed so actuals reflect
-  // freshly synced runs), so remember which weeks the user had expanded
-  // before this render and re-apply that after, instead of collapsing
-  // everything back to just the current week on every auto-refresh.
-  const openWeeks = new Set(
-    Array.from(document.querySelectorAll('.plan-week-body.open'))
-      .map(el => el.id.replace('pw-', ''))
-  );
-  list.innerHTML = PLAN.map(wk=>{
-    const isCurrent = wk.n===wkNow.n;
-    const isPastOrCurrent = wk.n <= wkNow.n;
+renderPlanChart();
+const wkNow = currentWeek();
+const list = document.getElementById('planList');
+// Re-rendering rebuilds every week row's HTML (needed so actuals reflect
+// freshly synced runs), so remember which weeks the user had expanded
+// before this render and re-apply that after, instead of collapsing
+// everything back to just the current week on every auto-refresh.
+const openWeeks = new Set(
+Array.from(document.querySelectorAll('.plan-week-body.open'))
+.map(el => el.id.replace('pw-', ''))
+);
+list.innerHTML = PLAN.map(wk=>{
+const isCurrent = wk.n===wkNow.n;
+const isPastOrCurrent = wk.n <= wkNow.n;
 
-    let actualHtml = '';
-    if(isPastOrCurrent){
-      const weekEnded = addDays(new Date(wk.start+'T00:00:00'), 6) < new Date();
-      const actual = getWeekActuals(wk);
-      const miColor = actual.totalMi >= wk.miles ? 'var(--green)' : (actual.totalMi >= wk.miles*0.7 ? 'var(--gold)' : 'var(--red)');
-      const notLoggedText = weekEnded
-        ? `<span style="color:var(--red);">✗ Missed</span>`
-        : `<span style="color:var(--text-muted);">not yet logged</span>`;
-      const longHtml = actual.longRun
-        ? `<span style="color:var(--green);">${actual.longRun.distance.toFixed(1)}mi @ ${secToPace(actual.longRun.time/actual.longRun.distance)}/mi</span>`
-        : (wk.long>0 ? notLoggedText : '—');
-      const keyHtml = actual.keySession
-        ? `<span style="color:var(--green);">✓ ${TYPE_LABEL[actual.keySession.type]} ${actual.keySession.distance.toFixed(1)}mi @ ${secToPace(actual.keySession.time/actual.keySession.distance)}/mi</span>`
-        : notLoggedText;
-      actualHtml = `
-        <div class="plan-actual">
-          <div class="pa-row"><span>Miles</span><span style="color:${miColor};">${actual.totalMi.toFixed(1)} / ${wk.miles} mi</span></div>
-          <div class="pa-row"><span>Long run</span>${longHtml}</div>
-          <div class="pa-row"><span>Key session</span>${keyHtml}</div>
-        </div>`;
-    }
+let actualHtml = '';
+if(isPastOrCurrent){
+const weekEnded = addDays(new Date(wk.start+'T00:00:00'), 6) < new Date();
+const actual = getWeekActuals(wk);
+const miColor = actual.totalMi >= wk.miles ? 'var(--green)' : (actual.totalMi >= wk.miles*0.7 ? 'var(--gold)' : 'var(--red)');
+const notLoggedText = weekEnded
+? `<span style="color:var(--red);">✗ Missed</span>`
+: `<span style="color:var(--text-muted);">not yet logged</span>`;
+const longHtml = actual.longRun
+? `<span style="color:var(--green);">${actual.longRun.distance.toFixed(1)}mi @ ${secToPace(actual.longRun.time/actual.longRun.distance)}/mi</span>`
+: (wk.long>0 ? notLoggedText : '—');
 
-    return `
-      <div class="plan-week ${isCurrent?'current':''}">
-        <div class="plan-week-head" onclick="togglePlanWeek(${wk.n})">
-          <div>
-            <div class="wk-num">Week ${wk.n}${isCurrent?' · Now':''}</div>
-            <div class="wk-dates">${weekRange(wk.start)} · ${wk.phase}</div>
-          </div>
-          <div class="wk-mi">${wk.miles} mi</div>
-        </div>
-        <div class="plan-week-body" id="pw-${wk.n}">
-          <b>Long run:</b> ${wk.long>0? wk.long+' mi' : '—'}<br>
-          <b>Key session:</b> ${wk.work}
-          ${actualHtml}
-        </div>
-      </div>`;
-  }).join('');
-  const weeksToOpen = openWeeks.size ? openWeeks : new Set([String(wkNow.n)]);
-  weeksToOpen.forEach(n => {
-    const el = document.getElementById(`pw-${n}`);
-    if(el) el.classList.add('open');
-  });
+let keySessionRowsHtml;
+if(actual.sessionMatches){
+keySessionRowsHtml = actual.sessionMatches.map((m,i)=>{
+const hit = !!m.run;
+const statusHtml = hit
+? `<span style="color:var(--green);">✓ ${m.run.distance.toFixed(1)}mi @ ${secToPace(m.run.time/m.run.distance)}/mi</span>`
+: notLoggedText;
+return `<div class="pa-row"><span>Key session ${i+1}: ${m.planned.day} ${TYPE_LABEL[m.planned.type]}</span>${statusHtml}</div>`;
+}).join('');
+} else {
+const keyHtml = actual.keySession
+? `<span style="color:var(--green);">✓ ${TYPE_LABEL[actual.keySession.type]} ${actual.keySession.distance.toFixed(1)}mi @ ${secToPace(actual.keySession.time/actual.keySession.distance)}/mi</span>`
+: notLoggedText;
+keySessionRowsHtml = `<div class="pa-row"><span>Key session</span>${keyHtml}</div>`;
+}
+
+actualHtml = `
+<div class="plan-actual">
+<div class="pa-row"><span>Miles</span><span style="color:${miColor};">${actual.totalMi.toFixed(1)} / ${wk.miles} mi</span></div>
+<div class="pa-row"><span>Long run</span>${longHtml}</div>
+${keySessionRowsHtml}
+</div>`;
+}
+
+const bodyContent = wk.sessions
+? `<b>Long run:</b> ${wk.long>0? wk.long+' mi' : '—'}` + wk.sessions.map(s=>`<div class="key-session-row"><b>${s.day} ${TYPE_LABEL[s.type]}:</b> ${s.desc}</div>`).join('')
+: `<b>Long run:</b> ${wk.long>0? wk.long+' mi' : '—'}<br><b>Key session:</b> ${wk.work}`;
+
+return `
+<div class="plan-week ${isCurrent?'current':''}">
+<div class="plan-week-head" onclick="togglePlanWeek(${wk.n})">
+<div>
+<div class="wk-num">Week ${wk.n}${isCurrent?' · Now':''}</div>
+<div class="wk-dates">${weekRange(wk.start)} · ${wk.phase}</div>
+</div>
+<div class="wk-mi">${wk.miles} mi</div>
+</div>
+<div class="plan-week-body" id="pw-${wk.n}">
+${bodyContent}
+${actualHtml}
+</div>
+</div>`;
+}).join('');
+const weeksToOpen = openWeeks.size ? openWeeks : new Set([String(wkNow.n)]);
+weeksToOpen.forEach(n => {
+const el = document.getElementById(`pw-${n}`);
+if(el) el.classList.add('open');
+});
 }
 function togglePlanWeek(n){ document.getElementById(`pw-${n}`).classList.toggle('open'); }
 
@@ -704,82 +833,82 @@ const TYPE_LABEL = {easy:'Easy',tempo:'Tempo',long:'Long',speed:'Speed',race:'Ra
 // stored whole-run value, fall back to averaging the splits' avg_hr if
 // that's ever missing.
 function runOverallAvgHr(r){
-  if(r.avgHeartrate) return r.avgHeartrate;
-  if(!r.splits || !r.splits.length) return null;
-  const withHr = r.splits.filter(s=>s.avg_hr!=null);
-  if(!withHr.length) return null;
-  return withHr.reduce((a,s)=>a+s.avg_hr,0)/withHr.length;
+if(r.avgHeartrate) return r.avgHeartrate;
+if(!r.splits || !r.splits.length) return null;
+const withHr = r.splits.filter(s=>s.avg_hr!=null);
+if(!withHr.length) return null;
+return withHr.reduce((a,s)=>a+s.avg_hr,0)/withHr.length;
 }
 
 function renderSplitRows(r){
-  const baselineHr = runOverallAvgHr(r);
-  return r.splits.map(s=>{
-    const isSpike = baselineHr!=null && s.avg_hr!=null && (s.avg_hr - baselineHr) >= HR_SPIKE_BPM;
-    const paceStr = s.pace_sec!=null ? `${secToPace(s.pace_sec)}/mi` : '—';
-    const hrStr = s.avg_hr!=null ? `${s.avg_hr} bpm` : '—';
-    return `<div class="split-row ${isSpike?'spike':''}"><span class="mi">Mi ${s.mile}${isSpike?' ⚠':''}</span><span>${paceStr}</span><span>${hrStr}</span></div>`;
-  }).join('');
+const baselineHr = runOverallAvgHr(r);
+return r.splits.map(s=>{
+const isSpike = baselineHr!=null && s.avg_hr!=null && (s.avg_hr - baselineHr) >= HR_SPIKE_BPM;
+const paceStr = s.pace_sec!=null ? `${secToPace(s.pace_sec)}/mi` : '—';
+const hrStr = s.avg_hr!=null ? `${s.avg_hr} bpm` : '—';
+return `<div class="split-row ${isSpike?'spike':''}"><span class="mi">Mi ${s.mile}${isSpike?' ⚠':''}</span><span>${paceStr}</span><span>${hrStr}</span></div>`;
+}).join('');
 }
 
 function renderHistory(){
-  const list = document.getElementById('historyList');
-  list.classList.remove('loading-state');
-  if(RUNS.length===0){
-    list.innerHTML = `<div class="empty-state">No runs synced yet.<br>Save a run in Strava and it'll show up here automatically.</div>`;
-    return;
-  }
-  // Re-rendering rebuilds every run's HTML, so remember which run details
-  // were expanded before this render and re-apply that after, rather than
-  // collapsing an open detail out from under the user on auto-refresh.
-  const openRunIds = new Set(
-    Array.from(document.querySelectorAll('.run-detail.open'))
-      .map(el => el.id.replace('rd-', ''))
-  );
+const list = document.getElementById('historyList');
+list.classList.remove('loading-state');
+if(RUNS.length===0){
+list.innerHTML = `<div class="empty-state">No runs synced yet.<br>Save a run in Strava and it'll show up here automatically.</div>`;
+return;
+}
+// Re-rendering rebuilds every run's HTML, so remember which run details
+// were expanded before this render and re-apply that after, rather than
+// collapsing an open detail out from under the user on auto-refresh.
+const openRunIds = new Set(
+Array.from(document.querySelectorAll('.run-detail.open'))
+.map(el => el.id.replace('rd-', ''))
+);
 
-  list.innerHTML = RUNS.map(r=>{
-    const paceSec = (r.time/r.distance);
-    const d = new Date(r.date+'T00:00:00');
-    const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    const isHardEasy = r.type==='easy' && isFinite(paceSec) && paceSec>0 && paceSec < EASY_TOO_HARD_SEC_PER_MI;
-    const hasSplits = Array.isArray(r.splits) && r.splits.length>0;
-    const isOpen = openRunIds.has(String(r.id));
-    const hasSpike = hasSplits && (() => {
-      const baseline = runOverallAvgHr(r);
-      return baseline!=null && r.splits.some(s=>s.avg_hr!=null && (s.avg_hr-baseline)>=HR_SPIKE_BPM);
-    })();
+list.innerHTML = RUNS.map(r=>{
+const paceSec = (r.time/r.distance);
+const d = new Date(r.date+'T00:00:00');
+const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+const isHardEasy = r.type==='easy' && isFinite(paceSec) && paceSec>0 && paceSec < EASY_TOO_HARD_SEC_PER_MI;
+const hasSplits = Array.isArray(r.splits) && r.splits.length>0;
+const isOpen = openRunIds.has(String(r.id));
+const hasSpike = hasSplits && (() => {
+const baseline = runOverallAvgHr(r);
+return baseline!=null && r.splits.some(s=>s.avg_hr!=null && (s.avg_hr-baseline)>=HR_SPIKE_BPM);
+})();
 
-    return `
-      <div class="run-item ${hasSplits?'expandable':''}">
-        <div class="run-item-head" ${hasSplits?`onclick="toggleRunDetail('${r.id}')"`:''}>
-          <div class="left">
-            <div class="date">${dateStr}<span class="type-badge type-${r.type}">${TYPE_LABEL[r.type] || r.type}</span></div>
-            <div class="stats">${r.distance.toFixed(2)} mi · ${secToClock(r.time)} · <span class="pace">${secToPace(paceSec)}/mi</span>${r.avgHeartrate ? ` · <span class="hr-badge">${r.avgHeartrate} bpm</span>` : ''}</div>
-            ${r.notes? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${escapeHtml(r.notes)}</div>` : ''}
-            ${isHardEasy ? `<div class="warn-note">⚠ Faster than goal-pace cushion for an "easy" day — check effort</div>` : ''}
-            <div class="synced-badge">Synced from Strava${hasSplits? ' · mile splits available':''}</div>
-          </div>
-          ${hasSplits ? `<span class="chevron ${isOpen?'open':''}">▾</span>` : ''}
-        </div>
-        ${hasSplits ? `
-          <div class="run-detail ${isOpen?'open':''}" id="rd-${r.id}">
-            <div class="run-detail-title">Mile Splits</div>
-            ${renderSplitRows(r)}
-            ${hasSpike ? `<div class="run-detail-note">⚠ One or more miles ran notably hotter (HR) than this run's own average — could be a hill, a surge, or effort creeping up.</div>` : ''}
-          </div>` : ''}
-      </div>`;
-  }).join('');
+return `
+<div class="run-item ${hasSplits?'expandable':''}">
+<div class="run-item-head" ${hasSplits?`onclick="toggleRunDetail('${r.id}')"`:''}>
+<div class="left">
+<div class="date">${dateStr}<span class="type-badge type-${r.type}" onclick="openTypePicker(event,'${r.id}')">${TYPE_LABEL[r.type] || r.type}</span></div>
+<div class="stats">${r.distance.toFixed(2)} mi · ${secToClock(r.time)} · <span class="pace">${secToPace(paceSec)}/mi</span>${r.avgHeartrate ? ` · <span class="hr-badge">${r.avgHeartrate} bpm</span>` : ''}</div>
+${r.notes? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${escapeHtml(r.notes)}</div>` : ''}
+${isHardEasy ? `<div class="warn-note">⚠ Faster than goal-pace cushion for an "easy" day — check effort</div>` : ''}
+<div class="synced-badge">Synced from Strava${hasSplits? ' · mile splits available':''}</div>
+</div>
+${hasSplits ? `<span class="chevron ${isOpen?'open':''}">▾</span>` : ''}
+</div>
+${hasSplits ? `
+<div class="run-detail ${isOpen?'open':''}" id="rd-${r.id}">
+<div class="run-detail-title">Mile Splits</div>
+${renderSplitRows(r)}
+${hasSpike ? `<div class="run-detail-note">⚠ One or more miles ran notably hotter (HR) than this run's own average — could be a hill, a surge, or effort creeping up.</div>` : ''}
+</div>` : ''}
+</div>`;
+}).join('');
 }
 function toggleRunDetail(id){
-  const el = document.getElementById(`rd-${id}`);
-  if(!el) return;
-  el.classList.toggle('open');
-  const chevron = el.previousElementSibling.querySelector('.chevron');
-  if(chevron) chevron.classList.toggle('open');
+const el = document.getElementById(`rd-${id}`);
+if(!el) return;
+el.classList.toggle('open');
+const chevron = el.previousElementSibling.querySelector('.chevron');
+if(chevron) chevron.classList.toggle('open');
 }
 function escapeHtml(s){
-  const div = document.createElement('div');
-  div.textContent = s;
-  return div.innerHTML;
+const div = document.createElement('div');
+div.textContent = s;
+return div.innerHTML;
 }
 
 // Minimum sustained distance, in miles, for a fast stretch within a run to
@@ -797,30 +926,30 @@ const EFFORT_PACE_MAX_SEC = PACE_TEMPO_MAX;
 // split's own distance so a trailing partial mile is weighted correctly —
 // or null if no stretch of at least MIN_EFFORT_MILES qualifies.
 function findBestEffortSegment(run){
-  if(!run.splits || run.splits.length < 2) return null;
+if(!run.splits || run.splits.length < 2) return null;
 
-  const splits = run.splits;
-  let best = null;
-  let i = 0;
-  while(i < splits.length){
-    if(splits[i].pace_sec == null || splits[i].pace_sec > EFFORT_PACE_MAX_SEC){
-      i++;
-      continue;
-    }
-    let j = i, segDist = 0, segTime = 0;
-    while(j < splits.length && splits[j].pace_sec != null && splits[j].pace_sec <= EFFORT_PACE_MAX_SEC){
-      const prevMile = j === 0 ? 0 : splits[j-1].mile;
-      const splitDist = splits[j].mile - prevMile;
-      segDist += splitDist;
-      segTime += splits[j].pace_sec * splitDist;
-      j++;
-    }
-    if(segDist >= MIN_EFFORT_MILES && (!best || segDist > best.distance)){
-      best = { distance: segDist, time: segTime };
-    }
-    i = j;
-  }
-  return best;
+const splits = run.splits;
+let best = null;
+let i = 0;
+while(i < splits.length){
+if(splits[i].pace_sec == null || splits[i].pace_sec > EFFORT_PACE_MAX_SEC){
+i++;
+continue;
+}
+let j = i, segDist = 0, segTime = 0;
+while(j < splits.length && splits[j].pace_sec != null && splits[j].pace_sec <= EFFORT_PACE_MAX_SEC){
+const prevMile = j === 0 ? 0 : splits[j-1].mile;
+const splitDist = splits[j].mile - prevMile;
+segDist += splitDist;
+segTime += splits[j].pace_sec * splitDist;
+j++;
+}
+if(segDist >= MIN_EFFORT_MILES && (!best || segDist > best.distance)){
+best = { distance: segDist, time: segTime };
+}
+i = j;
+}
+return best;
 }
 
 // Builds the qualifying-effort list behind the "Projected Marathon Time"
@@ -829,179 +958,179 @@ function findBestEffortSegment(run){
 // Riegel formula (T2 = T1 * (D2/D1)^1.06) — the standard way to
 // extrapolate marathon capability from a shorter hard effort.
 function getEffortProjections(){
-  return RUNS
-    .slice()
-    .sort((a,b)=> new Date(a.date) - new Date(b.date))
-    .map(r=>{
-      const seg = findBestEffortSegment(r);
-      if(!seg) return null;
-      const projectedSec = seg.time * Math.pow(26.2/seg.distance, 1.06);
-      return {
-        date: r.date,
-        segDistance: seg.distance,
-        segTime: seg.time,
-        segPace: seg.time/seg.distance,
-        projectedSec,
-      };
-    })
-    .filter(Boolean);
+return RUNS
+.slice()
+.sort((a,b)=> new Date(a.date) - new Date(b.date))
+.map(r=>{
+const seg = findBestEffortSegment(r);
+if(!seg) return null;
+const projectedSec = seg.time * Math.pow(26.2/seg.distance, 1.06);
+return {
+date: r.date,
+segDistance: seg.distance,
+segTime: seg.time,
+segPace: seg.time/seg.distance,
+projectedSec,
+};
+})
+.filter(Boolean);
 }
 
 function renderProjectionTrend(){
-  const content = document.getElementById('projTrendContent');
-  const projections = getEffortProjections();
+const content = document.getElementById('projTrendContent');
+const projections = getEffortProjections();
 
-  if(projections.length === 0){
-    content.innerHTML = `<div class="empty-state">No qualifying tempo/speed efforts yet.<br>Once a run has a sustained 2+ mile stretch at tempo pace (6:50/mi) or faster, a projected marathon time will show up here.</div>`;
-    return;
-  }
+if(projections.length === 0){
+content.innerHTML = `<div class="empty-state">No qualifying tempo/speed efforts yet.<br>Once a run has a sustained 2+ mile stretch at tempo pace (6:50/mi) or faster, a projected marathon time will show up here.</div>`;
+return;
+}
 
-  const latest = projections[projections.length-1];
-  const goalDiff = latest.projectedSec - GOAL_SECONDS;
+const latest = projections[projections.length-1];
+const goalDiff = latest.projectedSec - GOAL_SECONDS;
 
-  const chipsHtml = `
-    <div class="trend-chips">
-      <div class="trend-chip"><div class="label">Latest Projection</div><div class="value">${secToClock(latest.projectedSec)}</div></div>
-      <div class="trend-chip"><div class="label">Vs Goal (2:55:00)</div><div class="value ${goalDiff<=0?'good':'bad'}">${goalDiff<=0?'-':'+'}${secToClock(Math.abs(goalDiff))}</div></div>
-    </div>`;
+const chipsHtml = `
+<div class="trend-chips">
+<div class="trend-chip"><div class="label">Latest Projection</div><div class="value">${secToClock(latest.projectedSec)}</div></div>
+<div class="trend-chip"><div class="label">Vs Goal (2:55:00)</div><div class="value ${goalDiff<=0?'good':'bad'}">${goalDiff<=0?'-':'+'}${secToClock(Math.abs(goalDiff))}</div></div>
+</div>`;
 
-  let chartHtml = '';
-  if(projections.length >= 2){
-    const w = 600, h = 160, padX = 10, padY = 16;
-    const times = projections.map(p=>p.projectedSec);
-    const minT = Math.min(...times, GOAL_SECONDS) - 120;
-    const maxT = Math.max(...times, GOAL_SECONDS) + 120;
-    const points = projections.map((p,i)=>{
-      const x = padX + (i/(projections.length-1)) * (w - padX*2);
-      const y = padY + (1 - (p.projectedSec - minT)/(maxT - minT)) * (h - padY*2);
-      return {x,y};
-    });
-    const goalY = padY + (1 - (GOAL_SECONDS - minT)/(maxT - minT)) * (h - padY*2);
-    const pathD = points.map((p,i)=> (i===0?'M':'L') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
-    const dots = points.map(p=> `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="var(--gold)"/>`).join('');
-    chartHtml = `
-      <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;margin:6px 0 4px;">
-        <line x1="${padX}" y1="${goalY.toFixed(1)}" x2="${w-padX}" y2="${goalY.toFixed(1)}" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <path d="${pathD}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        ${dots}
-      </svg>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">
-        <span>Dashed line = 2:55:00 goal</span><span></span>
-      </div>`;
-  }
+let chartHtml = '';
+if(projections.length >= 2){
+const w = 600, h = 160, padX = 10, padY = 16;
+const times = projections.map(p=>p.projectedSec);
+const minT = Math.min(...times, GOAL_SECONDS) - 120;
+const maxT = Math.max(...times, GOAL_SECONDS) + 120;
+const points = projections.map((p,i)=>{
+const x = padX + (i/(projections.length-1)) * (w - padX*2);
+const y = padY + (1 - (p.projectedSec - minT)/(maxT - minT)) * (h - padY*2);
+return {x,y};
+});
+const goalY = padY + (1 - (GOAL_SECONDS - minT)/(maxT - minT)) * (h - padY*2);
+const pathD = points.map((p,i)=> (i===0?'M':'L') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
+const dots = points.map(p=> `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="var(--gold)"/>`).join('');
+chartHtml = `
+<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;margin:6px 0 4px;">
+<line x1="${padX}" y1="${goalY.toFixed(1)}" x2="${w-padX}" y2="${goalY.toFixed(1)}" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="4 3"/>
+<path d="${pathD}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+${dots}
+</svg>
+<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">
+<span>Dashed line = 2:55:00 goal</span><span></span>
+</div>`;
+}
 
-  const listHtml = projections.slice().reverse().map(p=>{
-    const d = new Date(p.date+'T00:00:00');
-    const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    return `<div class="trend-row"><span class="d">${dateStr} · ${p.segDistance.toFixed(1)}mi @ ${secToPace(p.segPace)}/mi effort</span><span>${secToClock(p.projectedSec)}</span></div>`;
-  }).join('');
+const listHtml = projections.slice().reverse().map(p=>{
+const d = new Date(p.date+'T00:00:00');
+const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+return `<div class="trend-row"><span class="d">${dateStr} · ${p.segDistance.toFixed(1)}mi @ ${secToPace(p.segPace)}/mi effort</span><span>${secToClock(p.projectedSec)}</span></div>`;
+}).join('');
 
-  content.innerHTML = `
-    <div class="trend-card">
-      ${chipsHtml}
-      ${chartHtml}
-      <div class="trend-list">${listHtml}</div>
-    </div>
-    <div class="trend-note">Projected from the fastest sustained 2+ mile stretch (tempo pace or faster) found within each run's mile splits, using the Riegel formula — a standard way to extrapolate marathon capability from a shorter hard effort. Treat it as a trend signal alongside your training, not a guarantee.</div>
-  `;
+content.innerHTML = `
+<div class="trend-card">
+${chipsHtml}
+${chartHtml}
+<div class="trend-list">${listHtml}</div>
+</div>
+<div class="trend-note">Projected from the fastest sustained 2+ mile stretch (tempo pace or faster) found within each run's mile splits, using the Riegel formula — a standard way to extrapolate marathon capability from a shorter hard effort. Treat it as a trend signal alongside your training, not a guarantee.</div>
+`;
 }
 
 function renderTrends(){
-  const content = document.getElementById('trendsContent');
-  const longRunsWithHR = RUNS
-    .filter(r => r.type === 'long' && r.avgHeartrate)
-    .slice()
-    .sort((a,b) => new Date(a.date) - new Date(b.date));
+const content = document.getElementById('trendsContent');
+const longRunsWithHR = RUNS
+.filter(r => r.type === 'long' && r.avgHeartrate)
+.slice()
+.sort((a,b) => new Date(a.date) - new Date(b.date));
 
-  if(longRunsWithHR.length === 0){
-    content.innerHTML = `<div class="empty-state">No heart rate data on long runs yet.<br>Once your device records HR on a synced long run, it'll show up here.</div>`;
-    return;
-  }
+if(longRunsWithHR.length === 0){
+content.innerHTML = `<div class="empty-state">No heart rate data on long runs yet.<br>Once your device records HR on a synced long run, it'll show up here.</div>`;
+return;
+}
 
-  const hrs = longRunsWithHR.map(r => r.avgHeartrate);
-  const minHR = Math.min(...hrs) - 5;
-  const maxHR = Math.max(...hrs) + 5;
-  const latest = longRunsWithHR[longRunsWithHR.length-1];
-  const first = longRunsWithHR[0];
-  const delta = latest.avgHeartrate - first.avgHeartrate;
+const hrs = longRunsWithHR.map(r => r.avgHeartrate);
+const minHR = Math.min(...hrs) - 5;
+const maxHR = Math.max(...hrs) + 5;
+const latest = longRunsWithHR[longRunsWithHR.length-1];
+const first = longRunsWithHR[0];
+const delta = latest.avgHeartrate - first.avgHeartrate;
 
-  let chipsHtml = `
-    <div class="trend-chips">
-      <div class="trend-chip"><div class="label">Latest Long Run HR</div><div class="value">${latest.avgHeartrate} bpm</div></div>
-      <div class="trend-chip"><div class="label">Vs First Synced</div><div class="value ${delta<0?'good':(delta>0?'bad':'')}">${delta>0?'+':''}${delta} bpm</div></div>
-    </div>`;
+let chipsHtml = `
+<div class="trend-chips">
+<div class="trend-chip"><div class="label">Latest Long Run HR</div><div class="value">${latest.avgHeartrate} bpm</div></div>
+<div class="trend-chip"><div class="label">Vs First Synced</div><div class="value ${delta<0?'good':(delta>0?'bad':'')}">${delta>0?'+':''}${delta} bpm</div></div>
+</div>`;
 
-  let chartHtml = '';
-  if(longRunsWithHR.length >= 2){
-    const w = 600, h = 160, padX = 10, padY = 16;
-    const points = longRunsWithHR.map((r,i) => {
-      const x = padX + (i/(longRunsWithHR.length-1)) * (w - padX*2);
-      const y = padY + (1 - (r.avgHeartrate - minHR)/(maxHR - minHR)) * (h - padY*2);
-      return {x,y};
-    });
-    const pathD = points.map((p,i) => (i===0?'M':'L') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
-    const dots = points.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="var(--gold)"/>`).join('');
-    chartHtml = `
-      <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;margin:6px 0 4px;">
-        <path d="${pathD}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        ${dots}
-      </svg>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">
-        <span>${maxHR+5} bpm</span><span>${minHR-5} bpm</span>
-      </div>`;
-  }
+let chartHtml = '';
+if(longRunsWithHR.length >= 2){
+const w = 600, h = 160, padX = 10, padY = 16;
+const points = longRunsWithHR.map((r,i) => {
+const x = padX + (i/(longRunsWithHR.length-1)) * (w - padX*2);
+const y = padY + (1 - (r.avgHeartrate - minHR)/(maxHR - minHR)) * (h - padY*2);
+return {x,y};
+});
+const pathD = points.map((p,i) => (i===0?'M':'L') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
+const dots = points.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="var(--gold)"/>`).join('');
+chartHtml = `
+<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;margin:6px 0 4px;">
+<path d="${pathD}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+${dots}
+</svg>
+<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">
+<span>${maxHR+5} bpm</span><span>${minHR-5} bpm</span>
+</div>`;
+}
 
-  const listHtml = longRunsWithHR.slice().reverse().map(r => {
-    const paceSec = r.time / r.distance;
-    const d = new Date(r.date+'T00:00:00');
-    const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    return `<div class="trend-row"><span class="d">${dateStr} · ${r.distance.toFixed(1)}mi · ${secToPace(paceSec)}/mi</span><span>${r.avgHeartrate} bpm</span></div>`;
-  }).join('');
+const listHtml = longRunsWithHR.slice().reverse().map(r => {
+const paceSec = r.time / r.distance;
+const d = new Date(r.date+'T00:00:00');
+const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+return `<div class="trend-row"><span class="d">${dateStr} · ${r.distance.toFixed(1)}mi · ${secToPace(paceSec)}/mi</span><span>${r.avgHeartrate} bpm</span></div>`;
+}).join('');
 
-  content.innerHTML = `
-    <div class="trend-card">
-      ${chipsHtml}
-      ${chartHtml}
-      <div class="trend-list">${listHtml}</div>
-    </div>
-    <div class="trend-note">This tracks average heart rate across your whole long run, not just the marathon-pace miles within it — treat it as a trend signal, not a precise readout. A flat or declining line while pace holds or improves is the sign your fitness is moving.</div>
-  `;
+content.innerHTML = `
+<div class="trend-card">
+${chipsHtml}
+${chartHtml}
+<div class="trend-list">${listHtml}</div>
+</div>
+<div class="trend-note">This tracks average heart rate across your whole long run, not just the marathon-pace miles within it — treat it as a trend signal, not a precise readout. A flat or declining line while pace holds or improves is the sign your fitness is moving.</div>
+`;
 }
 
 /* ---------------- Nav ---------------- */
 function switchView(name){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+name).classList.add('active');
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
-  window.scrollTo({top:0,behavior:'instant'});
+document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+document.getElementById('view-'+name).classList.add('active');
+document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+window.scrollTo({top:0,behavior:'instant'});
 }
 document.querySelectorAll('.tab-btn').forEach(b=>{
-  b.addEventListener('click', ()=>switchView(b.dataset.view));
+b.addEventListener('click', ()=>switchView(b.dataset.view));
 });
 
 /* ---------------- Refresh ---------------- */
 async function refreshAll(){
-  const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
-  btn.textContent = '...';
-  await loadRuns();
-  renderDashboard();
-  renderHistory();
-  renderProjectionTrend();
-  renderTrends();
-  renderPlan();
-  renderSeason();
-  btn.classList.remove('spinning');
-  btn.textContent = 'Refresh';
+const btn = document.getElementById('refreshBtn');
+btn.classList.add('spinning');
+btn.textContent = '...';
+await loadRuns();
+renderDashboard();
+renderHistory();
+renderProjectionTrend();
+renderTrends();
+renderPlan();
+renderSeason();
+btn.classList.remove('spinning');
+btn.textContent = 'Refresh';
 }
 document.getElementById('refreshBtn').addEventListener('click', refreshAll);
 
 /* ---------------- Init ---------------- */
 async function init(){
-  renderPlan();
-  await refreshAll();
-  // Passive auto-refresh while the tab is open, in case a run syncs mid-session.
-  setInterval(refreshAll, 60000);
+renderPlan();
+await refreshAll();
+// Passive auto-refresh while the tab is open, in case a run syncs mid-session.
+setInterval(refreshAll, 60000);
 }
 init();
 </script>
