@@ -1,9 +1,35 @@
-# sub3-strava-sync backend
+# Sub-3 — AI-Assisted Marathon Training Dashboard
 
-Syncs new Strava runs into Supabase automatically, so the tracker app can
-read live data instead of local device storage.
+I built Sub-3 to give myself one place to manage my CIM training instead of
+tracking runs, mileage, heart-rate trends, and my training plan across
+different tools.
 
-## What's here
+The app automatically syncs new Strava runs into Supabase using OAuth and
+webhooks, then displays the data in a live training dashboard. I used AI
+throughout the development process to help me design the application,
+write and debug code, work through API integrations, and iterate on the
+product despite not being a software engineer.
+
+**Live app:** [sub3-one.vercel.app](https://sub3-one.vercel.app)
+
+## What I built
+- Automatic Strava run syncing via OAuth + webhooks — no manual entry
+- Persistent training data in Supabase
+- 16-week training-plan tracking (planned vs. actual mileage)
+- Weekly mileage and full run history
+- Heart-rate trend analysis
+- Marathon-performance projection from in-run pace data
+
+## Built with
+JavaScript, Strava API, Supabase, Vercel, and AI-assisted development
+
+---
+
+## Technical setup (for my own reference)
+*How the Strava → Supabase sync is wired up — useful if I ever need to
+reconnect the integration.*
+
+### What's here
 
 - `api/strava/callback.js` — one-time OAuth endpoint, run once to connect your account
 - `api/strava/webhook.js` — the endpoint Strava calls every time you save a run
@@ -11,17 +37,17 @@ read live data instead of local device storage.
 - `lib/supabase.js` — Supabase client (service/secret key, backend only)
 - `scripts/register-webhook.js` — one-off script to tell Strava where to send events
 
-## Setup steps
+### Setup steps
 
-### 1. Push this to GitHub
+#### 1. Push this to GitHub
 Create a new repo (e.g. `sub3-strava-sync`) and push this folder to it.
 
-### 2. Deploy to Vercel
+#### 2. Deploy to Vercel
 - Import the GitHub repo in Vercel
 - No build settings needed — Vercel auto-detects the `/api` folder as serverless functions
 - Deploy. You'll get a URL like `https://sub3-strava-sync.vercel.app`
 
-### 3. Set environment variables in Vercel
+#### 3. Set environment variables in Vercel
 Project Settings -> Environment Variables. Add everything listed in `.env.example`:
 - `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` — from your Strava API app settings
 - `STRAVA_VERIFY_TOKEN` — make up any random string (e.g. run `openssl rand -hex 16`)
@@ -30,11 +56,11 @@ Project Settings -> Environment Variables. Add everything listed in `.env.exampl
 
 Redeploy after adding env vars so the functions pick them up.
 
-### 4. Update your Strava API app's "Authorization Callback Domain"
+#### 4. Update your Strava API app's "Authorization Callback Domain"
 In Strava's API settings, set the callback domain to your Vercel domain
 (just the domain, no path — e.g. `sub3-strava-sync.vercel.app`).
 
-### 5. Do the one-time OAuth handshake
+#### 5. Do the one-time OAuth handshake
 Build this URL, replacing `YOUR_CLIENT_ID` and `YOUR_VERCEL_DOMAIN`:
 
 ```
@@ -45,7 +71,7 @@ Visit it in your browser, approve access. You should land on a page that
 says "Strava connected." That means your `strava_tokens` row in Supabase
 now has a real access/refresh token pair.
 
-### 6. Register the webhook subscription
+#### 6. Register the webhook subscription
 Run this once from your own machine (needs Node 18+ installed):
 
 ```
@@ -60,12 +86,12 @@ Use the exact same `STRAVA_VERIFY_TOKEN` you set in Vercel. If it works,
 Strava will hit your webhook's GET endpoint to verify, and you'll see
 `Webhook subscription created` printed.
 
-### 7. Test it
+#### 7. Test it
 Log a run in Strava (or edit an existing one's title to trigger an event
 — note only new activities trigger `aspect_type: create`). Within a few
 seconds, check the `runs` table in Supabase — a new row should appear.
 
-## Notes
+### Notes
 - Only activities with type/sport_type `Run` are synced — rides, swims, etc. are ignored.
 - Runs are upserted by `strava_id`, so re-processing the same event twice never creates a duplicate.
 - If you ever revoke access on Strava's side, repeat step 5 to reconnect.
