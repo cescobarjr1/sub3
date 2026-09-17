@@ -9,7 +9,7 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Carlos' Tracker">
+<meta name="apple-mobile-web-app-title" content="C. Escobar — Sub-3">
 <meta name="theme-color" content="#12151A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -199,6 +199,9 @@ nav.tabbar button.active svg{stroke:var(--gold);}
 
 .goal-note{font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.5;padding:0 2px;}
 .loading-state{text-align:center;padding:30px;color:var(--text-muted);font-size:13px;}
+.skeleton{display:inline-block;min-width:1.4ch;height:1em;vertical-align:middle;border-radius:4px;background:linear-gradient(90deg, var(--surface-2) 25%, var(--line) 37%, var(--surface-2) 63%);background-size:400% 100%;animation:skeleton-pulse 1.4s ease infinite;}
+#currentPhase.skeleton{min-width:5ch;}
+@keyframes skeleton-pulse{0%{background-position:100% 0;}100%{background-position:0 0;}}
 </style>
 </head>
 <body>
@@ -216,8 +219,8 @@ nav.tabbar button.active svg{stroke:var(--gold);}
 <section class="view active" id="view-dashboard">
 <div class="countdown-card">
 <div class="eyebrow">Race Day Countdown</div>
-<div class="countdown-big"><span id="daysLeft">--</span><span class="unit">days<br>to CIM</span></div>
-<div class="countdown-meta"><b id="weeksLeft">--</b> weeks of training remaining · currently <b id="currentPhase">—</b></div>
+<div class="countdown-big"><span id="daysLeft" class="skeleton"></span><span class="unit">days<br>to CIM</span></div>
+<div class="countdown-meta"><b id="weeksLeft" class="skeleton"></b> weeks of training remaining · currently <b id="currentPhase" class="skeleton"></b></div>
 <div class="streak-pill" id="streakPill" style="display:none;"></div>
 </div>
 
@@ -626,10 +629,13 @@ const msLeft = RACE_DATE - now;
 const daysLeft = Math.max(0, Math.ceil(msLeft/(1000*60*60*24)));
 const weeksLeft = Math.max(0, Math.ceil(daysLeft/7));
 document.getElementById('daysLeft').textContent = daysLeft;
+document.getElementById('daysLeft').classList.remove('skeleton');
 document.getElementById('weeksLeft').textContent = weeksLeft;
+document.getElementById('weeksLeft').classList.remove('skeleton');
 
 const wk = currentWeek();
 document.getElementById('currentPhase').textContent = wk.phase + ' phase';
+document.getElementById('currentPhase').classList.remove('skeleton');
 
 renderStatusCard();
 renderStreak();
