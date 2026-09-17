@@ -127,6 +127,11 @@ padding:22px 20px;margin-bottom:16px;
 .run-item .stats .hr-badge{color:var(--red);}
 .run-item .chevron{color:var(--text-muted);font-size:11px;transition:transform .2s ease;flex-shrink:0;}
 .run-item .chevron.open{transform:rotate(180deg);}
+.run-item .right-icons{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.run-item .share-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;border-radius:6px;}
+.run-item .share-btn:hover{color:var(--gold);background:var(--surface-2);}
+.run-item .share-btn svg{width:16px;height:16px;stroke:currentColor;}
+.run-item .share-btn.sharing{opacity:0.5;pointer-events:none;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px;border:1px dashed var(--line);border-radius:var(--radius);}
 .synced-badge{font-size:10px;color:var(--green);letter-spacing:0.04em;text-transform:uppercase;margin-top:4px;}
 
@@ -850,6 +855,150 @@ return `<div class="split-row ${isSpike?'spike':''}"><span class="mi">Mi ${s.mil
 }).join('');
 }
 
+/* ---------------- Share Card ---------------- */
+// Hex values mirror the CSS custom properties in :root above — canvas
+// can't read CSS variables directly, so they're duplicated here. If the
+// palette in :root ever changes, update this object to match.
+const SHARE_COLORS = { bg:'#12151A', gold:'#C9A227', text:'#F2F1ED', muted:'#8A8F98', goldLine:'rgba(201,162,39,0.45)' };
+const WEEKDAY_FULL = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+
+// Draws one run's stats onto an offscreen canvas, styled to match the
+// approved share-card design (dark navy, gold Oswald headline, JetBrains
+// Mono stat rows, gold-line dividers, SUB3 · CIM wordmark). Returns the
+// canvas — caller decides whether to share, download, or preview it.
+async function drawShareCard(run){
+// Oswald/JetBrains Mono are already loaded via the Google Fonts link in
+// <head> — wait for them so the canvas doesn't draw in a fallback font
+// before they're ready.
+await Promise.all([
+document.fonts.load('700 220px Oswald'),
+document.fonts.load('600 32px Oswald'),
+document.fonts.load('700 56px "JetBrains Mono"'),
+]);
+await document.fonts.ready;
+
+const w = 1080, h = 1350;
+const canvas = document.createElement('canvas');
+canvas.width = w; canvas.height = h;
+const ctx = canvas.getContext('2d');
+
+ctx.fillStyle = SHARE_COLORS.bg;
+ctx.fillRect(0, 0, w, h);
+
+const d = new Date(run.date+'T00:00:00');
+const weekday = WEEKDAY_FULL[d.getDay()];
+const typeLabel = (TYPE_LABEL[run.type] || run.type).toUpperCase();
+const pillText = `${weekday} · ${typeLabel}`;
+
+// Top pill
+ctx.font = '600 26px Oswald';
+const pillPadX = 32, pillH = 58;
+const pillTextW = ctx.measureText(pillText).width;
+const pillW = pillTextW + pillPadX*2;
+const pillX = (w-pillW)/2, pillY = 96;
+ctx.strokeStyle = SHARE_COLORS.gold;
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.roundRect(pillX, pillY, pillW, pillH, pillH/2);
+ctx.stroke();
+ctx.fillStyle = SHARE_COLORS.gold;
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.fillText(pillText, w/2, pillY + pillH/2 + 2);
+
+// Big distance number, with "MI" set beside it
+const distText = run.distance.toFixed(2);
+ctx.font = '700 220px Oswald';
+const distW = ctx.measureText(distText).width;
+const distX = (w - distW)/2;
+ctx.textAlign = 'left';
+ctx.textBaseline = 'alphabetic';
+ctx.fillStyle = SHARE_COLORS.gold;
+ctx.fillText(distText, distX, 520);
+ctx.font = '600 44px Oswald';
+ctx.fillStyle = SHARE_COLORS.text;
+ctx.fillText('MI', distX + distW + 18, 520);
+
+// Stat rows: PACE / TIME / HR, each with a gold divider beneath it
+const paceSec = run.time / run.distance;
+const stats = [
+['PACE', `${secToPace(paceSec)}/mi`],
+['TIME', secToClock(run.time)],
+['HR', run.avgHeartrate ? `${run.avgHeartrate}bpm` : '—'],
+];
+const leftX = 100, rightX = w - 100;
+let y = 660;
+const rowH = 160;
+stats.forEach(([label, value])=>{
+ctx.textAlign = 'left';
+ctx.textBaseline = 'alphabetic';
+ctx.font = '600 34px Oswald';
+ctx.fillStyle = SHARE_COLORS.muted;
+ctx.fillText(label, leftX, y);
+ctx.textAlign = 'right';
+ctx.font = '700 58px "JetBrains Mono"';
+ctx.fillStyle = SHARE_COLORS.text;
+ctx.fillText(value, rightX, y + 6);
+ctx.strokeStyle = SHARE_COLORS.goldLine;
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.moveTo(leftX, y + 42);
+ctx.lineTo(rightX, y + 42);
+ctx.stroke();
+y += rowH;
+});
+
+// Bottom wordmark
+ctx.textAlign = 'center';
+ctx.font = '600 30px Oswald';
+ctx.fillStyle = SHARE_COLORS.gold;
+ctx.fillText('SUB3 · CIM', w/2, h - 90);
+
+return canvas;
+}
+
+// Triggered by the share icon on a run card. Draws the card, then uses
+// the native share sheet where available (mobile Safari/Chrome) so it
+// can go straight to Messages/Instagram/etc.; falls back to a plain PNG
+// download anywhere that's not supported (most desktop browsers).
+async function shareRun(runId){
+const run = RUNS.find(r=>r.id==runId);
+if(!run) return;
+const btn = event?.currentTarget;
+if(btn) btn.classList.add('sharing');
+try{
+const canvas = await drawShareCard(run);
+const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+if(!blob){
+console.error('Failed to generate share image');
+return;
+}
+const fileName = `run-${run.date}.png`;
+const file = new File([blob], fileName, { type: 'image/png' });
+
+if(navigator.canShare && navigator.canShare({ files: [file] })){
+try{
+await navigator.share({ files: [file], title: 'Run recap' });
+return;
+} catch(e){
+if(e.name === 'AbortError') return; // user cancelled the share sheet
+// otherwise fall through to download below
+}
+}
+
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = fileName;
+document.body.appendChild(a);
+a.click();
+a.remove();
+URL.revokeObjectURL(url);
+} finally {
+if(btn) btn.classList.remove('sharing');
+}
+}
+
 function renderHistory(){
 const list = document.getElementById('historyList');
 list.classList.remove('loading-state');
@@ -887,7 +1036,12 @@ ${r.notes? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
 ${isHardEasy ? `<div class="warn-note">⚠ Faster than goal-pace cushion for an "easy" day — check effort</div>` : ''}
 <div class="synced-badge">Synced from Strava${hasSplits? ' · mile splits available':''}</div>
 </div>
+<div class="right-icons">
+<button class="share-btn" onclick="event.stopPropagation();shareRun('${r.id}')" title="Share">
+<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>
+</button>
 ${hasSplits ? `<span class="chevron ${isOpen?'open':''}">▾</span>` : ''}
+</div>
 </div>
 ${hasSplits ? `
 <div class="run-detail ${isOpen?'open':''}" id="rd-${r.id}">
