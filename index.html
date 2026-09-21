@@ -383,30 +383,30 @@ const PLAN = [
 {n:7, start:'2026-09-28', phase:'Build', miles:57, long:17, sessions:[
 {day:'Tue', type:'tempo', desc:'5mi continuous @ 7:00-7:05/mi'},
 {day:'Fri', type:'speed', desc:'4x1200m @ 6:15/mi'}]},
-{n:8, start:'2026-10-05', phase:'Cutback', miles:42, long:12, sessions:[
-{day:'Tue', type:'tempo', desc:'3x2mi @ 6:55-7:00/mi'},
-{day:'Fri', type:'speed', desc:'8x800m @ 6:15/mi'}]},
-{n:9, start:'2026-10-12', phase:'Peak', miles:58, long:18, sessions:[
-{day:'Tue', type:'tempo', desc:'6mi progression, easy to 7:00 last 4mi'},
-{day:'Fri', type:'speed', desc:'5x1000m @ 6:10/mi'}]},
-{n:10, start:'2026-10-19', phase:'Peak', miles:60, long:19, sessions:[
-{day:'Tue', type:'tempo', desc:'2x3mi @ 7:00/mi'},
-{day:'Fri', type:'speed', desc:'3x1600m @ 6:15/mi'}]},
-{n:11, start:'2026-10-26', phase:'Peak', miles:62, long:20, sessions:[
-{day:'Tue', type:'tempo', desc:'8mi w/ 5mi @ 7:16/mi (MP)'},
-{day:'Fri', type:'speed', desc:'6x800m @ 6:15/mi'}]},
-{n:12, start:'2026-11-02', phase:'Cutback', miles:44, long:13, sessions:[
-{day:'Tue', type:'tempo', desc:'10mi w/ 6mi @ 7:16/mi (MP)'},
-{day:'Fri', type:'speed', desc:'4x1000m @ 6:10/mi'}]},
-{n:13, start:'2026-11-09', phase:'Peak', miles:58, long:17, sessions:[
-{day:'Tue', type:'tempo', desc:'4mi @ 6:50-6:55/mi'},
-{day:'Fri', type:'speed', desc:'5x800m @ 6:05-6:10/mi'}]},
-{n:14, start:'2026-11-16', phase:'Taper', miles:42, long:12, sessions:[
-{day:'Tue', type:'tempo', desc:'3x1.5mi @ 6:50/mi'},
-{day:'Fri', type:'speed', desc:'6x400m + 4x200m (fast)'}]},
-{n:15, start:'2026-11-23', phase:'Taper', miles:32, long:8, sessions:[
-{day:'Tue', type:'tempo', desc:'3mi @ 6:55/mi'},
-{day:'Fri', type:'speed', desc:'4x400m strides, easy'}]},
+{n:8, start:'2026-10-05', phase:'Cutback', miles:42, long:14, sessions:[
+{day:'Tue', type:'tempo', desc:'4mi continuous @ 6:55/mi'},
+{day:'Fri', type:'speed', desc:'4x1000m @ 6:05/mi'}]},
+{n:9, start:'2026-10-12', phase:'Peak', miles:58, long:18, longDesc:'18mi, last 6mi @ 7:04/mi (MP)', sessions:[
+{day:'Tue', type:'tempo', desc:'6mi continuous @ 6:45/mi'},
+{day:'Fri', type:'speed', desc:'6x1000m @ 6:00/mi'}]},
+{n:10, start:'2026-10-19', phase:'Peak', miles:60, long:20, longDesc:'20mi, last 8mi @ 7:04/mi (MP)', sessions:[
+{day:'Tue', type:'tempo', desc:'7mi continuous @ 6:40/mi'},
+{day:'Fri', type:'speed', desc:'6x1000m @ 5:55/mi'}]},
+{n:11, start:'2026-10-26', phase:'Peak', miles:62, long:20, longDesc:'20mi, last 10mi @ 7:04/mi (MP)', sessions:[
+{day:'Tue', type:'tempo', desc:'8mi continuous @ 6:50/mi'},
+{day:'Fri', type:'speed', desc:'5x1200m @ 6:00/mi'}]},
+{n:12, start:'2026-11-02', phase:'Cutback', miles:44, long:15, sessions:[
+{day:'Tue', type:'tempo', desc:'5mi continuous @ 6:55/mi'},
+{day:'Fri', type:'speed', desc:'5x1000m @ 6:05/mi'}]},
+{n:13, start:'2026-11-09', phase:'Peak', miles:58, long:18, longDesc:'18mi, last 8mi @ 7:04/mi (MP)', sessions:[
+{day:'Tue', type:'tempo', desc:'6mi continuous @ 6:45/mi'},
+{day:'Fri', type:'speed', desc:'6x1000m @ 6:00/mi'}]},
+{n:14, start:'2026-11-16', phase:'Taper', miles:42, long:12, longDesc:'12mi, last 4mi @ 7:04/mi (MP)', sessions:[
+{day:'Tue', type:'tempo', desc:'4mi continuous @ 6:50/mi'},
+{day:'Fri', type:'speed', desc:'4x1000m @ 6:00/mi'}]},
+{n:15, start:'2026-11-23', phase:'Taper', miles:32, long:8, longDesc:'8mi, last 2mi @ 7:04/mi (MP)', sessions:[
+{day:'Tue', type:'easy', desc:'3mi easy'},
+{day:'Fri', type:'speed', desc:'4x400m @ 5:45/mi'}]},
 {n:16, start:'2026-11-30', phase:'Race', miles:32, long:0, work:'Shakeouts of 2-3mi Tue/Thu/Fri. Race day Sunday Dec 6 — go get your 2:55.'},
 ];
 
@@ -690,7 +690,7 @@ document.getElementById('thisWeekCard').innerHTML = `
 <div class="stat-line"><span>${totalMi.toFixed(1)} mi logged</span><span>${wk.miles} mi target</span></div>
 <div class="bar-track"><div class="bar-fill ${over?'over':''}" style="width:${pct}%"></div></div>
 <div class="progress-note ${over?'hit':''}">${progressText}</div>
-<div class="workouts"><b>Long run:</b> ${wk.long>0? wk.long+' mi' : 'race week — see notes'}${longActualText}<br>${keySessionsHtml}</div>
+<div class="workouts"><b>Long run:</b> ${wk.long>0? (wk.longDesc || wk.long+' mi') : 'race week — see notes'}${longActualText}<br>${keySessionsHtml}</div>
 `;
 }
 
@@ -812,8 +812,8 @@ ${keySessionRowsHtml}
 }
 
 const bodyContent = wk.sessions
-? `<b>Long run:</b> ${wk.long>0? wk.long+' mi' : '—'}` + wk.sessions.map(s=>`<div class="key-session-row"><b>${s.day} ${TYPE_LABEL[s.type]}:</b> ${s.desc}</div>`).join('')
-: `<b>Long run:</b> ${wk.long>0? wk.long+' mi' : '—'}<br><b>Key session:</b> ${wk.work}`;
+? `<b>Long run:</b> ${wk.long>0? (wk.longDesc || wk.long+' mi') : '—'}` + wk.sessions.map(s=>`<div class="key-session-row"><b>${s.day} ${TYPE_LABEL[s.type]}:</b> ${s.desc}</div>`).join('')
+: `<b>Long run:</b> ${wk.long>0? (wk.longDesc || wk.long+' mi') : '—'}<br><b>Key session:</b> ${wk.work}`;
 
 return `
 <div class="plan-week ${isCurrent?'current':''}">
