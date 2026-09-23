@@ -3,6 +3,7 @@ const {
   getValidAccessToken,
   fetchActivity,
   fetchActivityStreams,
+  fetchActivityLaps,
   computeMileSplits,
   mapActivityToRun,
 } = require('../../lib/strava');
@@ -47,8 +48,22 @@ module.exports = async (req, res) => {
             console.error('Failed to fetch/compute splits:', splitsErr.message);
           }
 
-          const run = mapActivityToRun(activity, splits);
+          // Laps, like splits, only refine the label — a failure here
+          // falls back to the other classification rules.
+          let laps = Array.isArray(activity.laps) ? activity.laps : null;
+          if (!laps) {
+            try {
+              laps = await fetchActivityLaps(activity.id, accessToken);
+            } catch (lapsErr) {
+              console.error('Failed to fetch laps:', lapsErr.message);
+            }
+          }
+
+          const run = mapActivityToRun(activity, splits, laps);
           run.splits = splits;
+          console.log('DEBUG classified run:', run.strava_id, run.type,
+            'laps:', laps ? laps.length : 'none',
+            '(from', Array.isArray(activity.laps) ? 'activity detail)' : 'laps endpoint)');
 
           const supabase = getSupabaseClient();
 
