@@ -327,9 +327,11 @@ const PACE_TEMPO_MAX = 410;
 const RUN_TYPES = ['easy','tempo','long','speed','race'];
 
 async function setRunType(runId, newType){
-const { error } = await db.from('runs').update({ type: newType }).eq('id', runId);
-if(error){
-console.error('Failed to update run type:', error.message);
+// .select() returns the rows actually written — an update blocked by RLS
+// comes back with no error and zero rows, so both cases count as failure.
+const { data, error } = await db.from('runs').update({ type: newType }).eq('id', runId).select('id');
+if(error || !data || data.length===0){
+console.error('Failed to update run type:', error ? error.message : 'no rows updated');
 alert('Could not save — check that the runs table allows updates from this key (RLS policy).');
 return false;
 }
