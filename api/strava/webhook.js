@@ -35,17 +35,20 @@ module.exports = async (req, res) => {
         console.log('DEBUG fetched activity type:', activity.type, activity.sport_type);
 
         if (activity.type === 'Run' || activity.sport_type === 'Run') {
-          const run = mapActivityToRun(activity);
-
           // Splits are a bonus on top of the base sync — never let a
-          // streams failure stop the run itself from being saved.
+          // streams failure stop the run itself from being saved. They're
+          // computed first because classification uses them to spot a
+          // tempo block inside an otherwise easy-paced run.
+          let splits = null;
           try {
             const streams = await fetchActivityStreams(activity.id, accessToken);
-            run.splits = computeMileSplits(streams);
+            splits = computeMileSplits(streams);
           } catch (splitsErr) {
             console.error('Failed to fetch/compute splits:', splitsErr.message);
-            run.splits = null;
           }
+
+          const run = mapActivityToRun(activity, splits);
+          run.splits = splits;
 
           const supabase = getSupabaseClient();
 

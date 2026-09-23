@@ -314,9 +314,10 @@ const EASY_TOO_HARD_SEC_PER_MI = GOAL_PACE_SEC_PER_MI - 20;
 // overall average HR is flagged as a spike (a surge, not just the run
 // being harder overall).
 const HR_SPIKE_BPM = 10;
-// Tempo-or-faster pace threshold, in sec/mi — mirrors lib/strava.js's
-// PACE_TEMPO_MAX (a separate, backend-only file not loaded by this page),
-// used here to find hard-effort segments within a run's mile splits.
+// Hard-effort pace threshold, in sec/mi, used to find segments within a
+// run's mile splits for the marathon projection. Same value as
+// lib/strava.js's whole-run PACE_TEMPO_MAX; deliberately stricter than that
+// file's TEMPO_SPLIT_MAX (7:15/mi), which only decides the run's label.
 const PACE_TEMPO_MAX = 410;
 
 /* ---------------- Manual run-type override ---------------- */
@@ -327,9 +328,11 @@ const PACE_TEMPO_MAX = 410;
 const RUN_TYPES = ['easy','tempo','long','speed','race'];
 
 async function setRunType(runId, newType){
-const { error } = await db.from('runs').update({ type: newType }).eq('id', runId);
-if(error){
-console.error('Failed to update run type:', error.message);
+// .select() returns the rows actually written — an update blocked by RLS
+// comes back with no error and zero rows, so both cases count as failure.
+const { data, error } = await db.from('runs').update({ type: newType }).eq('id', runId).select('id');
+if(error || !data || data.length===0){
+console.error('Failed to update run type:', error ? error.message : 'no rows updated');
 alert('Could not save — check that the runs table allows updates from this key (RLS policy).');
 return false;
 }
