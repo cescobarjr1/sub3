@@ -5,6 +5,7 @@ const {
   fetchActivityStreams,
   fetchActivityLaps,
   computeMileSplits,
+  compactLaps,
   mapActivityToRun,
 } = require('../../lib/strava');
 
@@ -61,6 +62,7 @@ module.exports = async (req, res) => {
 
           const run = mapActivityToRun(activity, splits, laps);
           run.splits = splits;
+          run.laps = compactLaps(laps);
           console.log('DEBUG classified run:', run.strava_id, run.type,
             'laps:', laps ? laps.length : 'none',
             '(from', Array.isArray(activity.laps) ? 'activity detail)' : 'laps endpoint)');

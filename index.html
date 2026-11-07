@@ -143,6 +143,9 @@ padding:22px 20px;margin-bottom:16px;
 .split-row .mi{color:var(--text);font-family:'Inter',sans-serif;}
 .split-row.spike{color:var(--red);}
 .split-row.spike .mi{color:var(--red);}
+.split-row.rep{color:var(--gold);}
+.split-row.rep .mi{color:var(--gold);font-weight:600;}
+.run-detail-title.second{margin-top:14px;}
 .run-detail-note{font-size:11px;color:var(--red);margin-top:8px;line-height:1.4;}
 
 .trend-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;margin-bottom:16px;}
@@ -622,6 +625,7 @@ notes: r.notes,
 source: r.source,
 avgHeartrate: r.avg_heartrate || null,
 splits: Array.isArray(r.splits) ? r.splits : null,
+laps: Array.isArray(r.laps) && r.laps.length > 1 ? r.laps : null,
 }));
 }
 
@@ -864,6 +868,20 @@ return `<div class="split-row ${isSpike?'spike':''}"><span class="mi">Mi ${s.mil
 }).join('');
 }
 
+// Laps at or faster than this are highlighted as reps — same 6:30/mi
+// threshold the Strava sync (LAP_SPEED_MAX in lib/strava.js) uses to spot
+// speed laps. Defined here because index.html can't see backend constants.
+const LAP_REP_MAX_SEC = 390;
+
+function renderLapRows(r){
+return r.laps.map(l=>{
+const isRep = l.pace_sec!=null && l.pace_sec <= LAP_REP_MAX_SEC;
+const paceStr = l.pace_sec!=null ? `${secToPace(l.pace_sec)}/mi` : '—';
+const hrStr = l.avg_hr!=null ? `${l.avg_hr} bpm` : '—';
+return `<div class="split-row ${isRep?'rep':''}"><span class="mi">Lap ${l.lap} · ${Number(l.distance_mi).toFixed(2)}mi</span><span>${secToClock(l.time_sec)} · ${paceStr}</span><span>${hrStr}</span></div>`;
+}).join('');
+}
+
 /* ---------------- Share Card ---------------- */
 // Hex values mirror the CSS custom properties in :root above — canvas
 // can't read CSS variables directly, so they're duplicated here. If the
@@ -1029,6 +1047,8 @@ const d = new Date(r.date+'T00:00:00');
 const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 const isHardEasy = r.type==='easy' && isFinite(paceSec) && paceSec>0 && paceSec < EASY_TOO_HARD_SEC_PER_MI;
 const hasSplits = Array.isArray(r.splits) && r.splits.length>0;
+const hasLaps = Array.isArray(r.laps) && r.laps.length>1;
+const hasDetail = hasSplits || hasLaps;
 const isOpen = openRunIds.has(String(r.id));
 const hasSpike = hasSplits && (() => {
 const baseline = runOverallAvgHr(r);
@@ -1036,26 +1056,28 @@ return baseline!=null && r.splits.some(s=>s.avg_hr!=null && (s.avg_hr-baseline)>
 })();
 
 return `
-<div class="run-item ${hasSplits?'expandable':''}">
-<div class="run-item-head" ${hasSplits?`onclick="toggleRunDetail('${r.id}')"`:''}>
+<div class="run-item ${hasDetail?'expandable':''}">
+<div class="run-item-head" ${hasDetail?`onclick="toggleRunDetail('${r.id}')"`:''}>
 <div class="left">
 <div class="date">${dateStr}<span class="type-badge type-${r.type}" onclick="openTypePicker(event,'${r.id}')">${TYPE_LABEL[r.type] || r.type}</span></div>
 <div class="stats">${r.distance.toFixed(2)} mi · ${secToClock(r.time)} · <span class="pace">${secToPace(paceSec)}/mi</span>${r.avgHeartrate ? ` · <span class="hr-badge">${r.avgHeartrate} bpm</span>` : ''}</div>
 ${r.notes? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${escapeHtml(r.notes)}</div>` : ''}
 ${isHardEasy ? `<div class="warn-note">⚠ Faster than goal-pace cushion for an "easy" day — check effort</div>` : ''}
-<div class="synced-badge">Synced from Strava${hasSplits? ' · mile splits available':''}</div>
+<div class="synced-badge">Synced from Strava${hasLaps? ' · laps':''}${hasSplits? ' · mile splits available':''}</div>
 </div>
 <div class="right-icons">
 <button class="share-btn" onclick="event.stopPropagation();shareRun('${r.id}')" title="Share">
 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>
 </button>
-${hasSplits ? `<span class="chevron ${isOpen?'open':''}">▾</span>` : ''}
+${hasDetail ? `<span class="chevron ${isOpen?'open':''}">▾</span>` : ''}
 </div>
 </div>
-${hasSplits ? `
+${hasDetail ? `
 <div class="run-detail ${isOpen?'open':''}" id="rd-${r.id}">
-<div class="run-detail-title">Mile Splits</div>
-${renderSplitRows(r)}
+${hasLaps ? `<div class="run-detail-title">Laps</div>
+${renderLapRows(r)}` : ''}
+${hasSplits ? `<div class="run-detail-title ${hasLaps?'second':''}">Mile Splits</div>
+${renderSplitRows(r)}` : ''}
 ${hasSpike ? `<div class="run-detail-note">⚠ One or more miles ran notably hotter (HR) than this run's own average — could be a hill, a surge, or effort creeping up.</div>` : ''}
 </div>` : ''}
 </div>`;
